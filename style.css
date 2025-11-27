@@ -17,10 +17,14 @@ body.dark-mode {
     --shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
-* { box-sizing: border-box; outline: none; }
+/* اجبار فونت روی همه المان‌ها */
+* { 
+    box-sizing: border-box; 
+    outline: none; 
+    font-family: 'Vazirmatn', sans-serif !important; 
+}
 
 body {
-    font-family: 'Vazirmatn', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     display: flex;
@@ -29,7 +33,7 @@ body {
     min-height: 100vh;
     margin: 0;
     transition: background 0.3s;
-    direction: rtl; /* اجبار راست‌چین */
+    direction: rtl;
 }
 
 .container {
@@ -49,7 +53,7 @@ header {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
-    flex-direction: row-reverse; /* تایتل راست، منو چپ */
+    flex-direction: row-reverse; 
 }
 
 h1 { 
@@ -76,7 +80,7 @@ h1 {
 .settings-wrapper { position: relative; }
 .dropdown-menu {
     position: absolute;
-    top: 120%; left: 0; /* باز شدن از چپ */
+    top: 120%; left: 0;
     background: var(--container-bg);
     border: 1px solid var(--border-color);
     border-radius: 16px;
@@ -128,7 +132,7 @@ h1 {
 .color-circle:hover { transform: scale(1.2); }
 .color-circle.active { border-color: var(--text-color); transform: scale(1.1); }
 
-/* Input Group */
+/* Input Group - جابجایی انجام شده */
 .input-group {
     display: flex;
     gap: 10px;
@@ -157,6 +161,8 @@ h1 {
     cursor: pointer;
     box-shadow: 0 4px 10px var(--primary-color); 
     flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding-bottom: 5px; /* تراز عمودی پلاس */
 }
 
 /* Task List */
@@ -169,11 +175,10 @@ ul { list-style: none; padding: 0; margin: 0; }
     border-radius: 14px;
     display: flex;
     align-items: center;
-    justify-content: space-between; /* مهم برای فاصله */
+    justify-content: space-between; 
     transition: 0.3s;
 }
 
-/* بخش سمت راست: چک‌باکس و متن */
 .task-left {
     display: flex;
     align-items: center;
@@ -207,7 +212,6 @@ ul { list-style: none; padding: 0; margin: 0; }
     text-overflow: ellipsis;
 }
 
-/* بخش سمت چپ: سطل آشغال */
 .delete-btn {
     background: transparent;
     border: none;
@@ -220,7 +224,7 @@ ul { list-style: none; padding: 0; margin: 0; }
 }
 .delete-btn:hover { color: #ef4444; opacity: 1; transform: scale(1.1); }
 
-/* تسک‌های تکمیل شده */
+/* Completed */
 .completed-section {
     border-top: 1px solid var(--border-color);
     margin-top: 20px;
@@ -236,8 +240,7 @@ ul { list-style: none; padding: 0; margin: 0; }
 .task-item.completed { opacity: 0.6; background: transparent; border: 1px solid var(--border-color); }
 .task-item.completed .task-text { text-decoration: line-through; }
 
-
-/* Modal Styles */
+/* Modal */
 .modal {
     display: none;
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
