@@ -45,17 +45,20 @@ body {
     direction: rtl;
 }
 
-/* استایل لوگوی جدید */
 .brand-logo {
-    font-size: 2.5rem;
-    font-weight: 900;
+    font-size: 2.8rem; /* کمی بزرگتر برای بولد بودن */
+    font-weight: 900;  /* ضخامت حداکثری (Black) */
     color: var(--primary-color);
-    margin-bottom: 40px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-family: sans-serif !important; /* برای لوگوی انگلیسی فونت ساده بهتر است */
+    margin-bottom: 25px;
+    letter-spacing: 1px; /* فاصله حروف */
+    text-transform: uppercase; /* تمام حروف بزرگ */
+    
+    /* اعمال فونت جدید */
+    font-family: 'Montserrat', sans-serif !important; 
+    
     cursor: default;
 }
+
 
 .container {
     background: var(--container-bg);
