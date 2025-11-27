@@ -3,104 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لیست کارها</title>
+    <title>لیست کارهای من</title>
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-    <!-- فاوآیکون (تیک آبی) -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%233b82f6%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><circle cx=%2212%22 cy=%2212%22 r=%2210%22 fill=%22white%22/><path d=%22M9 12l2 2 4-4%22/></svg>">
-    
+    <!-- اتصال به فایل استایل -->
     <link rel="stylesheet" href="style.css">
+    <!-- کتابخانه Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
     <div class="app-wrapper">
         <div class="container">
+            
+            <!-- هدر اصلی -->
             <header>
                 <h1 id="header-title">لیست کارها</h1>
+                
                 <div class="header-controls">
-                    <!-- انتخاب رنگ با آیکون -->
-                    <div class="control-item">
-                        <input type="color" id="color-picker" value="#3b82f6">
-                        <button class="icon-btn" title="تغییر رنگ">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"></circle><circle cx="17.5" cy="10.5" r=".5"></circle><circle cx="8.5" cy="7.5" r=".5"></circle><circle cx="6.5" cy="12.5" r=".5"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.01 17.461 2 12 2z"></path></svg>
-                        </button>
-                    </div>
+                    <!-- دکمه تغییر تم -->
+                    <button id="theme-toggle" class="icon-btn" title="تغییر تم"></button>
                     
-                    <!-- دکمه دارک مود -->
-                    <button class="icon-btn" id="theme-toggle" title="حالت شب/روز">
-                        <!-- آیکون توسط JS پر می‌شود -->
-                    </button>
-                    
-                    <!-- دکمه حساب کاربری و منوی کشویی -->
+                    <!-- منوی کاربر -->
                     <div class="user-menu-container">
-                        <button class="icon-btn" id="auth-btn" title="حساب کاربری">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <button id="user-btn" class="icon-btn" title="حساب کاربری">
+                            <!-- آیکون یوزر با جاوااسکریپت پر می‌شود -->
                         </button>
-                        <!-- منوی کشویی (Dropdown) -->
+                        
+                        <!-- منوی کشویی -->
                         <div id="user-dropdown" class="dropdown-menu">
-                            <div class="dropdown-header">
-                                <span id="dropdown-username">کاربر مهمان</span>
-                            </div>
-                            <button id="logout-btn" class="dropdown-item text-danger">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                                خروج از حساب
+                            <div class="dropdown-header" id="user-display-name">کاربر مهمان</div>
+                            <button class="dropdown-item text-danger" id="logout-btn">
+                                <span>خروج از حساب</span>
+                                <span id="logout-icon"></span>
                             </button>
                         </div>
                     </div>
                 </div>
             </header>
 
+            <!-- فرم افزودن تسک -->
             <div class="input-group">
                 <button id="add-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </button>
-                <input type="text" id="todo-input" placeholder="کاری برای انجام دارید؟">
+                <input type="text" id="task-input" placeholder="کار جدید را بنویسید...">
             </div>
 
-            <ul id="todo-list">
-                <!-- لیست تسک‌ها -->
-            </ul>
+            <!-- لیست تسک‌ها -->
+            <ul id="task-list"></ul>
+            
+            <!-- جداکننده و لیست انجام شده‌ها -->
+            <div id="completed-section" style="display: none;">
+                <div class="list-separator"><span>انجام شده</span></div>
+                <ul id="completed-list"></ul>
+            </div>
+
         </div>
     </div>
 
-    <!-- مودال ورود/ثبت نام -->
+    <!-- مودال احراز هویت (ورود / ثبت نام) -->
     <div id="auth-modal" class="modal-overlay">
         <div class="modal-box">
-            <button class="close-modal">×</button>
+            <button id="close-modal" class="close-btn">×</button>
+            
             <h2 id="modal-title">ورود به حساب</h2>
-            <p class="modal-desc">اطلاعات خود را وارد کنید</p>
+            <p class="modal-subtitle">برای ذخیره آنلاین کارها وارد شوید</p>
             
             <div class="modal-inputs">
-                <!-- فیلدهای جدید برای ثبت نام -->
-                <div id="signup-fields" style="display:none; gap:10px; flex-direction:column; width:100%;">
-                    <input type="text" id="fname-input" placeholder="نام (مثلا: آرمان)">
-                    <input type="text" id="lname-input" placeholder="نام خانوادگی">
+                <!-- بخش نام و نام خانوادگی (فقط برای ثبت نام) -->
+                <div id="signup-fields" style="display: none; gap: 10px;">
+                    <input type="text" id="fname-input" placeholder="نام" class="half-input">
+                    <input type="text" id="lname-input" placeholder="نام خانوادگی" class="half-input">
                 </div>
 
-                <input type="text" id="username-input" placeholder="نام کاربری (انگلیسی)">
-                <input type="password" id="password-input" placeholder="رمز عبور">
+                <!-- ایمیل -->
+                <input type="email" id="email-input" placeholder="ایمیل (name@gmail.com)" style="direction: ltr; text-align: left;">
+                
+                <!-- رمز عبور -->
+                <input type="password" id="password-input" placeholder="رمز عبور (حداقل ۶ رقم)" style="direction: ltr; text-align: left;">
             </div>
-            
-            <button class="primary-btn" id="submit-auth-btn">ورود</button>
-            <p id="auth-msg"></p>
 
+            <div id="auth-msg" class="msg-box"></div>
+
+            <button id="submit-auth-btn" class="primary-btn">ورود</button>
+            
             <div class="switch-auth">
                 <span id="switch-text">حساب ندارید؟</span>
-                <a href="#" id="switch-auth-link">ثبت نام</a>
+                <a href="#" id="switch-auth-link">ثبت نام کنید</a>
             </div>
         </div>
     </div>
 
-    <!-- مودال پیام سیستم (جایگزین Alert) -->
-    <div id="alert-modal" class="modal-overlay" style="z-index: 2000;">
-        <div class="modal-box small-box">
-            <h3 id="alert-title">پیام</h3>
-            <p id="alert-text">متن پیام</p>
-            <div class="modal-actions">
-                <button id="alert-ok-btn" class="primary-btn">باشه</button>
-                <button id="alert-cancel-btn" class="secondary-btn" style="display:none;">انصراف</button>
-            </div>
+    <!-- مودال پیام (Alert سفارشی) -->
+    <div id="custom-alert" class="modal-overlay">
+        <div class="modal-box" style="max-width: 300px; padding: 1.5rem;">
+            <h3 id="alert-title" style="margin-top:0">پیام</h3>
+            <p id="alert-msg" style="color: var(--text-light); line-height: 1.6;"></p>
+            <button id="alert-ok-btn" class="primary-btn" style="margin-top: 15px; width: 100%;">باشه</button>
         </div>
     </div>
 
