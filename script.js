@@ -1,251 +1,306 @@
-// --- تنظیمات Supabase ---
+// ---------------------------------------------------------
+// CONFIGURATION
+// ---------------------------------------------------------
 const SUPABASE_URL = 'https://zzbnbsmywmpmkqhbloro.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_gZqBqViTWwWnKoMgSxEH3g_BtiJJ3VE';
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_KEY = 'YOUR_SUPABASE_PUBLISHABLE_KEY_HERE'; // کلید طولانی که با sb_ شروع نمی‌شود را اینجا بگذارید (معمولا anon key)
+// اگر کلید sb_publishable_... دارید آن را قرار دهید اما معمولا در کلاینت JS از کلید anon استفاده میشود.
 
-// --- المان‌های HTML ---
-const todoInput = document.getElementById('todoInput');
-const addTodoBtn = document.getElementById('addTodoBtn');
-const todoList = document.getElementById('todoList');
-const emptyState = document.getElementById('emptyState');
-const themeToggle = document.getElementById('themeToggle');
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// المان‌های لاگین و مودال
-const loginBtnHeader = document.getElementById('loginBtnHeader');
-const loginModal = document.getElementById('loginModal');
-const closeModal = document.getElementById('closeModal');
-const emailInput = document.getElementById('emailInput');
-const passwordInput = document.getElementById('passwordInput');
-const submitLoginBtn = document.getElementById('submitLoginBtn');
-const submitSignupBtn = document.getElementById('submitSignupBtn');
-const authMessage = document.getElementById('authMessage');
-const userStatusDot = document.getElementById('userStatusDot');
-const logoutBtn = document.getElementById('logoutBtn');
+// ---------------------------------------------------------
+// STATE MANAGEMENT
+// ---------------------------------------------------------
+let todos = [];
+let user = null; // If null, save to LocalStorage. If object, save to Supabase.
+let currentThemeColor = '#3b82f6'; // Blue default
 
-let user = null;
-let localTodos = JSON.parse(localStorage.getItem('guest_todos')) || [];
+// ---------------------------------------------------------
+// DOM ELEMENTS
+// ---------------------------------------------------------
+const todoInput = document.getElementById('todo-input');
+const addBtn = document.getElementById('add-btn');
+const todoList = document.getElementById('todo-list');
+const themeModeBtn = document.getElementById('theme-mode-btn');
+const themeColorBtn = document.getElementById('theme-color-btn');
+const authBtn = document.getElementById('auth-btn');
+const authModal = document.getElementById('auth-modal');
+const closeModal = document.querySelector('.close-modal');
 
-// --- شروع برنامه ---
+// Auth Inputs
+const usernameInput = document.getElementById('username-input');
+const passwordInput = document.getElementById('password-input');
+const loginBtn = document.getElementById('login-submit-btn');
+const signupBtn = document.getElementById('signup-submit-btn');
+const authMessage = document.getElementById('auth-message');
+const userInfoDisplay = document.getElementById('user-info-display');
+const usernameSpan = document.getElementById('username-span');
+const logoutBtn = document.getElementById('logout-btn');
+
+// ---------------------------------------------------------
+// INITIALIZATION
+// ---------------------------------------------------------
 window.addEventListener('DOMContentLoaded', async () => {
     loadTheme();
-    
-    // بررسی وضعیت لاگین در سوپابیس
-    const { data } = await supabase.auth.getSession();
-    if (data.session) {
-        handleUserLoggedIn(data.session.user);
+    await checkUserSession();
+    if (!user) {
+        loadLocalTodos();
     } else {
-        handleUserGuest();
+        loadSupabaseTodos();
     }
 });
 
-// --- مدیریت وضعیت کاربر ---
-function handleUserLoggedIn(userData) {
-    user = userData;
-    userStatusDot.className = 'status-dot connected'; // سبز
-    loginModal.style.display = 'none';
-    loginBtnHeader.innerHTML = '👤'; // تغییر آیکون ابر به آدمک
-    logoutBtn.style.display = 'block';
-    
-    syncLocalToCloud().then(() => {
-        fetchTodos();
+// ---------------------------------------------------------
+// CORE FUNCTIONS
+// ---------------------------------------------------------
+
+function renderTodos() {
+    todoList.innerHTML = '';
+    todos.forEach((todo, index) => {
+        const li = document.createElement('li');
+        if (todo.is_completed) li.classList.add('completed');
+
+        li.innerHTML = `
+            <span onclick="toggleTodo(${index})">${todo.task}</span>
+            <button class="delete-btn" onclick="deleteTodo(${index})">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        `;
+        todoList.appendChild(li);
     });
 }
 
-function handleUserGuest() {
-    user = null;
-    userStatusDot.className = 'status-dot disconnected'; // خاکستری/قرمز
-    loginBtnHeader.innerHTML = '☁️'; // آیکون ابر برای مهمان
-    logoutBtn.style.display = 'none';
-    renderTodos(localTodos);
+async function addTodo() {
+    const taskText = todoInput.value.trim();
+    if (!taskText) return;
+
+    const newTodo = { task: taskText, is_completed: false };
+
+    if (user) {
+        // Supabase
+        const { data, error } = await supabase
+            .from('todos')
+            .insert([{ task: taskText, user_id: user.id }])
+            .select();
+        
+        if(data) {
+            todos.push(data[0]); // Use returned data which has ID
+        }
+    } else {
+        // LocalStorage
+        todos.push(newTodo);
+        saveLocalTodos();
+    }
+
+    todoInput.value = '';
+    renderTodos();
 }
 
-// --- همگام‌سازی (انتقال لوکال به دیتابیس) ---
-async function syncLocalToCloud() {
-    if (localTodos.length > 0) {
-        // آماده‌سازی داده‌ها برای ارسال به دیتابیس
-        const records = localTodos.map(todo => ({
-            text: todo.text,
-            is_completed: todo.is_completed,
-            user_id: user.id
-        }));
+window.deleteTodo = async (index) => {
+    const todoToDelete = todos[index];
 
-        // ارسال به سوپابیس
-        const { error } = await supabase.from('todos').insert(records);
+    if (user) {
+        const { error } = await supabase
+            .from('todos')
+            .delete()
+            .eq('id', todoToDelete.id);
         
         if (!error) {
-            // اگر موفق بود، لوکال را پاک کن
-            localStorage.removeItem('guest_todos');
-            localTodos = [];
+            todos.splice(index, 1);
         }
+    } else {
+        todos.splice(index, 1);
+        saveLocalTodos();
+    }
+    renderTodos();
+};
+
+window.toggleTodo = async (index) => {
+    const todoToToggle = todos[index];
+    const newStatus = !todoToToggle.is_completed;
+
+    if (user) {
+        const { error } = await supabase
+            .from('todos')
+            .update({ is_completed: newStatus })
+            .eq('id', todoToToggle.id);
+        
+        if(!error) {
+            todos[index].is_completed = newStatus;
+        }
+    } else {
+        todos[index].is_completed = newStatus;
+        saveLocalTodos();
+    }
+    renderTodos();
+};
+
+// ---------------------------------------------------------
+// LOCAL STORAGE HELPERS
+// ---------------------------------------------------------
+function loadLocalTodos() {
+    const stored = localStorage.getItem('local_todos');
+    if (stored) {
+        todos = JSON.parse(stored);
+    }
+    renderTodos();
+}
+
+function saveLocalTodos() {
+    localStorage.setItem('local_todos', JSON.stringify(todos));
+}
+
+// ---------------------------------------------------------
+// SUPABASE HELPERS
+// ---------------------------------------------------------
+async function loadSupabaseTodos() {
+    const { data, error } = await supabase
+        .from('todos')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+    if (!error) {
+        todos = data;
+        renderTodos();
     }
 }
 
-// --- لاگین / ثبت نام ---
-loginBtnHeader.addEventListener('click', () => {
+async function checkUserSession() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+        user = session.user;
+        showLoggedInUI(user.user_metadata.username || user.email);
+    }
+}
+
+// ---------------------------------------------------------
+// AUTHENTICATION UI LOGIC
+// ---------------------------------------------------------
+authBtn.addEventListener('click', () => {
     if(!user) {
-        loginModal.style.display = 'flex';
-        authMessage.textContent = '';
+        authModal.classList.remove('hidden');
+        authMessage.innerText = '';
     }
 });
 
-closeModal.addEventListener('click', () => loginModal.style.display = 'none');
+closeModal.addEventListener('click', () => {
+    authModal.classList.add('hidden');
+});
 
-// کلیک بیرون مودال برای بستن
-window.onclick = (event) => {
-    if (event.target == loginModal) loginModal.style.display = 'none';
+// Helper for "Fake" Email generation since Supabase Auth needs Email
+function createEmailFromUsername(username) {
+    return `${username}@myapp.local`;
 }
 
-submitLoginBtn.addEventListener('click', async () => {
-    const email = emailInput.value;
-    const password = passwordInput.value;
-    if(!email || !password) return;
+signupBtn.addEventListener('click', async () => {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
 
-    authMessage.textContent = "در حال ورود...";
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (username.length < 4 || password.length < 4) {
+        authMessage.innerText = 'نام کاربری و رمز عبور باید حداقل ۴ حرف باشند.';
+        authMessage.style.color = 'red';
+        return;
+    }
+
+    const email = createEmailFromUsername(username);
+
+    const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+            data: { username: username }
+        }
+    });
 
     if (error) {
-        authMessage.textContent = "خطا: " + error.message;
-        authMessage.style.color = "red";
+        authMessage.innerText = error.message;
+        authMessage.style.color = 'red';
     } else {
-        handleUserLoggedIn(data.user);
+        authMessage.innerText = 'ثبت نام موفق! وارد شوید.';
+        authMessage.style.color = 'green';
     }
 });
 
-submitSignupBtn.addEventListener('click', async () => {
-    const email = emailInput.value;
-    const password = passwordInput.value;
-    if(!email || !password) return;
+loginBtn.addEventListener('click', async () => {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+    const email = createEmailFromUsername(username);
 
-    authMessage.textContent = "در حال ثبت نام...";
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+    });
 
     if (error) {
-        authMessage.textContent = error.message;
-        authMessage.style.color = "red";
+        authMessage.innerText = 'نام کاربری یا رمز عبور اشتباه است.';
+        authMessage.style.color = 'red';
     } else {
-        authMessage.textContent = "ثبت نام انجام شد! وارد شوید.";
-        authMessage.style.color = "green";
-        if(data.session) handleUserLoggedIn(data.session.user);
+        user = data.user;
+        authModal.classList.add('hidden');
+        // Sync strategy: Could merge local todos to cloud here if needed.
+        // For now, we just switch to cloud view.
+        todos = []; 
+        loadSupabaseTodos();
+        showLoggedInUI(username);
     }
 });
 
 logoutBtn.addEventListener('click', async () => {
     await supabase.auth.signOut();
-    handleUserGuest();
+    user = null;
+    userInfoDisplay.classList.add('hidden');
+    authBtn.style.display = 'block';
+    // Switch back to local todos
+    todos = [];
+    loadLocalTodos();
 });
 
-// --- عملیات اصلی (CRUD) ---
+function showLoggedInUI(name) {
+    authBtn.style.display = 'none';
+    userInfoDisplay.classList.remove('hidden');
+    usernameSpan.innerText = `کاربر: ${name}`;
+}
 
-// ۱. افزودن
-addTodoBtn.addEventListener('click', async () => {
-    const text = todoInput.value.trim();
-    if (!text) return;
-
-    addTodoBtn.textContent = "...";
-
-    if (user) {
-        // ذخیره در دیتابیس
-        const { error } = await supabase.from('todos').insert([{ text, user_id: user.id }]);
-        if (!error) fetchTodos();
-    } else {
-        // ذخیره در لوکال
-        const newTodo = { id: Date.now(), text, is_completed: false };
-        localTodos.unshift(newTodo);
-        saveLocal();
-        renderTodos(localTodos);
-    }
-
-    todoInput.value = '';
-    addTodoBtn.textContent = 'افزودن';
-});
-
+// ---------------------------------------------------------
+// THEME & EVENTS
+// ---------------------------------------------------------
+addBtn.addEventListener('click', addTodo);
 todoInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') addTodoBtn.click();
+    if (e.key === 'Enter') addTodo();
 });
 
-// ۲. دریافت لیست
-async function fetchTodos() {
-    if (user) {
-        const { data, error } = await supabase
-            .from('todos')
-            .select('*')
-            .order('created_at', { ascending: false });
-        if (!error) renderTodos(data);
-    } else {
-        renderTodos(localTodos);
-    }
-}
-
-// ۳. نمایش لیست
-function renderTodos(todos) {
-    todoList.innerHTML = '';
-    if (todos.length === 0) {
-        emptyState.style.display = 'block';
-    } else {
-        emptyState.style.display = 'none';
-        todos.forEach(todo => {
-            const li = document.createElement('li');
-            li.className = `todo-item ${todo.is_completed ? 'completed' : ''}`;
-            li.innerHTML = `
-                <div class="todo-left" onclick="toggleTask('${todo.id}', ${todo.is_completed})">
-                    <div class="check-circle">✔</div>
-                    <span>${todo.text}</span>
-                </div>
-                <button class="delete-icon" onclick="deleteTask('${todo.id}')">🗑</button>
-            `;
-            todoList.appendChild(li);
-        });
-    }
-}
-
-// ۴. تغییر وضعیت
-window.toggleTask = async (id, currentStatus) => {
-    if (user) {
-        await supabase.from('todos').update({ is_completed: !currentStatus }).eq('id', id);
-        fetchTodos();
-    } else {
-        const todo = localTodos.find(t => t.id == id);
-        if (todo) {
-            todo.is_completed = !currentStatus;
-            saveLocal();
-            renderTodos(localTodos);
-        }
-    }
-};
-
-// ۵. حذف
-window.deleteTask = async (id) => {
-    if (user) {
-        await supabase.from('todos').delete().eq('id', id);
-        fetchTodos();
-    } else {
-        localTodos = localTodos.filter(t => t.id != id);
-        saveLocal();
-        renderTodos(localTodos);
-    }
-};
-
-function saveLocal() {
-    localStorage.setItem('guest_todos', JSON.stringify(localTodos));
-}
-
-// --- تم (Dark Mode) ---
-themeToggle.addEventListener('click', () => {
+// Dark/Light Mode
+themeModeBtn.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    updateThemeIcon();
+    themeModeBtn.innerHTML = isDark ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    localStorage.setItem('theme_mode', isDark ? 'dark' : 'light');
+});
+
+// Color Theme
+const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'];
+let colorIndex = 0;
+
+themeColorBtn.addEventListener('click', () => {
+    colorIndex = (colorIndex + 1) % colors.length;
+    const newColor = colors[colorIndex];
+    document.documentElement.style.setProperty('--primary-color', newColor);
+    localStorage.setItem('theme_color', newColor);
 });
 
 function loadTheme() {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') document.body.classList.add('dark-mode');
-    updateThemeIcon();
-}
+    // Mode
+    const savedMode = localStorage.getItem('theme_mode');
+    if (savedMode === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeModeBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+    }
 
-function updateThemeIcon() {
-    const isDark = document.body.classList.contains('dark-mode');
-    // آیکون ماه یا خورشید
-    themeToggle.innerHTML = isDark ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>' 
-                                   : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+    // Color
+    const savedColor = localStorage.getItem('theme_color');
+    if (savedColor) {
+        document.documentElement.style.setProperty('--primary-color', savedColor);
+        // Find index to cycle correctly next time
+        const idx = colors.indexOf(savedColor);
+        if(idx !== -1) colorIndex = idx;
+    }
 }
