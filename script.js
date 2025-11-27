@@ -279,7 +279,7 @@ function openEditProfile() {
     
     // رمز عبور خالی باشد (چون رمز قبلی را نداریم و فقط برای تغییر است)
     els.passwordInput.value = '';
-    els.passwordInput.placeholder = 'رمز عبور جدید (اختیاری)';
+    els.passwordInput.placeholder = 'رمز عبور جدید';
 
     openModal(els.authModal);
 }
