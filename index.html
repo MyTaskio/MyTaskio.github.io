@@ -4,64 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لیست کارها</title>
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Vazir Font (Optional for Persian look) -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-    <div class="main-container">
-        <!-- هدر دقیقاً مثل عکس -->
-        <div class="header">
-            <div class="header-right">
-                <h1>لیست کارها</h1>
+    <div class="container">
+        <header class="app-header">
+            <div class="controls">
+                <button id="theme-color-btn" title="تغییر رنگ تم"><i class="fa-solid fa-palette"></i></button>
+                <button id="theme-mode-btn" title="حالت شب/روز"><i class="fa-solid fa-moon"></i></button>
+                <button id="auth-btn" title="حساب کاربری"><i class="fa-solid fa-user"></i></button>
             </div>
-            <div class="header-left">
-                <!-- آیکون وضعیت اتصال/لاگین (ابر یا آدمک) -->
-                <div class="icon-wrapper">
-                    <button id="loginBtnHeader" class="icon-btn" title="ورود/ذخیره ابری">☁️</button>
-                    <span id="userStatusDot" class="status-dot disconnected"></span>
-                </div>
-                
-                <!-- آیکون تم -->
-                <button id="themeToggle" class="icon-btn" title="تغییر تم">🌙</button>
-                
-                <!-- دکمه خروج (فقط وقتی لاگین است دیده می‌شود) -->
-                <button id="logoutBtn" class="icon-btn logout-mini" style="display:none;" title="خروج">🚪</button>
-            </div>
+            <h1>لیست کارها</h1>
+        </header>
+
+        <div class="input-group">
+            <input type="text" id="todo-input" placeholder="کار جدید را وارد کنید...">
+            <button id="add-btn">افزودن</button>
         </div>
 
-        <!-- بدنه اصلی (همیشه نمایش داده می‌شود) -->
-        <div id="appContainer" class="card-body">
-            
-            <div class="input-area">
-                <input type="text" id="todoInput" placeholder="...5555">
-                <button id="addTodoBtn" class="btn-add">افزودن</button>
-            </div>
-
-            <ul id="todoList" class="todo-list"></ul>
-            
-            <div id="emptyState" class="empty-state">کاری برای انجام نیست!</div>
+        <ul id="todo-list">
+            <!-- Tasks will be added here -->
+        </ul>
+        
+        <div id="user-info-display" class="hidden">
+            <span id="username-span"></span>
+            <button id="logout-btn" class="small-btn">خروج</button>
         </div>
     </div>
 
-    <!-- مودال لاگین (مخفی تا زمان کلیک روی ابر) -->
-    <div id="loginModal" class="modal-overlay">
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal hidden">
         <div class="modal-content">
-            <span id="closeModal" class="close-btn">&times;</span>
-            <h2>ذخیره ابری ☁️</h2>
-            <p class="modal-desc">برای ذخیره دائمی کارها وارد شوید.</p>
-            
-            <div class="form-group">
-                <input type="email" id="emailInput" placeholder="ایمیل" dir="ltr">
-                <input type="password" id="passwordInput" placeholder="رمز عبور" dir="ltr">
+            <span class="close-modal">&times;</span>
+            <h2 id="modal-title">ورود / ثبت نام</h2>
+            <div class="auth-form">
+                <input type="email" id="email-input" placeholder="ایمیل (اختیاری برای تست)" style="display:none;"> <!-- Supabase uses email usually, but we map user/pass -->
+                <input type="text" id="username-input" placeholder="نام کاربری (حداقل ۴ حرف)">
+                <input type="password" id="password-input" placeholder="رمز عبور (حداقل ۴ حرف)">
+                <div class="auth-actions">
+                    <button id="login-submit-btn" class="primary-btn">ورود</button>
+                    <button id="signup-submit-btn" class="secondary-btn">ثبت نام</button>
+                </div>
+                <p id="auth-message"></p>
             </div>
-
-            <div class="modal-actions">
-                <button id="submitLoginBtn" class="btn primary-btn">ورود</button>
-                <button id="submitSignupBtn" class="btn outline-btn">ثبت نام</button>
-            </div>
-            <p id="authMessage" class="message"></p>
         </div>
     </div>
 
