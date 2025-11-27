@@ -6,9 +6,7 @@
     <title>لیست کارهای من</title>
     <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-    <!-- اتصال به فایل استایل -->
     <link rel="stylesheet" href="style.css">
-    <!-- کتابخانه Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -18,51 +16,53 @@
             
             <!-- هدر اصلی -->
             <header>
-                <h1 id="header-title">تسکینو | مدیریت تسک</h1>
-                
-                <div class="header-controls">
-                    <!-- دکمه تغییر تم -->
-                    <button id="theme-toggle" class="icon-btn" title="تغییر تم"></button>
-                    
-                    <!-- منوی کاربر -->
-                    <div class="user-menu-container">
-                        <button id="user-btn" class="icon-btn" title="حساب کاربری">
-                            <!-- آیکون یوزر با جاوااسکریپت پر می‌شود -->
-                        </button>
-                        
-                        <!-- منوی کشویی -->
-                        <div id="user-dropdown" class="dropdown-menu">
-                            <div class="dropdown-header" id="user-display-name">کاربر مهمان</div>
-                            <button class="dropdown-item text-danger" id="logout-btn">
-                                <span>خروج از حساب</span>
-                                <span id="logout-icon"></span>
-                            </button>
-                        </div>
+                <div class="header-top">
+                    <div class="header-controls">
+                        <button id="user-btn" class="icon-btn" title="حساب کاربری"></button>
+                        <button id="theme-toggle" class="icon-btn" title="تغییر تم"></button>
                     </div>
+                    <h1 id="header-title">لیست کارها</h1>
+                </div>
+
+                <!-- پالت رنگ (تم‌های محدود) -->
+                <div class="color-palette">
+                    <span class="color-dot" style="background:#007aff;" data-color="#007aff"></span>
+                    <span class="color-dot" style="background:#5856d6;" data-color="#5856d6"></span>
+                    <span class="color-dot" style="background:#34c759;" data-color="#34c759"></span>
+                    <span class="color-dot" style="background:#ff9500;" data-color="#ff9500"></span>
+                    <span class="color-dot" style="background:#ff3b30;" data-color="#ff3b30"></span>
+                </div>
+                
+                <!-- منوی کشویی کاربر -->
+                <div id="user-dropdown" class="dropdown-menu">
+                    <div class="dropdown-header" id="user-display-name">کاربر مهمان</div>
+                    <button class="dropdown-item text-danger" id="logout-btn">
+                        <span>خروج از حساب</span>
+                        <span id="logout-icon"></span>
+                    </button>
                 </div>
             </header>
 
             <!-- فرم افزودن تسک -->
             <div class="input-group">
                 <button id="add-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 </button>
                 <input type="text" id="task-input" placeholder="کار جدید را بنویسید...">
             </div>
 
-            <!--  تسک‌ها -->
+            <!-- لیست تسک‌ها -->
             <ul id="task-list"></ul>
             
-            <!-- جداکننده و  انجام شده‌ها -->
+            <!-- جداکننده و لیست انجام شده‌ها -->
             <div id="completed-section" style="display: none;">
                 <div class="list-separator"><span>انجام شده</span></div>
                 <ul id="completed-list"></ul>
             </div>
-
         </div>
     </div>
 
-    <!-- مودال احراز هویت (ورود / ثبت نام) -->
+    <!-- مودال احراز هویت -->
     <div id="auth-modal" class="modal-overlay">
         <div class="modal-box">
             <button id="close-modal" class="close-btn">×</button>
@@ -71,17 +71,17 @@
             <p class="modal-subtitle">برای ذخیره آنلاین کارها وارد شوید</p>
             
             <div class="modal-inputs">
-                <!-- بخش نام و نام خانوادگی (فقط برای ثبت نام) -->
                 <div id="signup-fields" style="display: none; gap: 10px;">
                     <input type="text" id="fname-input" placeholder="نام" class="half-input">
                     <input type="text" id="lname-input" placeholder="نام خانوادگی" class="half-input">
                 </div>
-
-                <!-- ایمیل -->
-                <input type="email" id="email-input" placeholder="ایمیل (name@gmail.com)" style="direction: ltr; text-align: left;">
-                
-                <!-- رمز عبور -->
+                <input type="email" id="email-input" placeholder="ایمیل (مثلا: name@gmail.com)" style="direction: ltr; text-align: left;">
                 <input type="password" id="password-input" placeholder="رمز عبور (حداقل ۶ رقم)" style="direction: ltr; text-align: left;">
+                
+                <!-- لینک فراموشی رمز -->
+                <div style="text-align: left; margin-top: 5px;">
+                    <a href="#" id="forgot-pass-link" style="font-size: 0.8rem; color: var(--text-light);">رمز عبور را فراموش کردید؟</a>
+                </div>
             </div>
 
             <div id="auth-msg" class="msg-box"></div>
@@ -99,8 +99,8 @@
     <div id="custom-alert" class="modal-overlay">
         <div class="modal-box" style="max-width: 300px; padding: 1.5rem;">
             <h3 id="alert-title" style="margin-top:0">پیام</h3>
-            <p id="alert-msg" style="color: var(--text-light); line-height: 1.6;"></p>
-            <button id="alert-ok-btn" class="primary-btn" style="margin-top: 15px; width: 100%;">باشه</button>
+            <p id="alert-msg" style="color: var(--text-light); line-height: 1.6; margin-bottom: 20px;"></p>
+            <button id="alert-ok-btn" class="primary-btn" style="width: 100%;">باشه</button>
         </div>
     </div>
 
