@@ -1,7 +1,9 @@
-// --- تنظیمات Supabase (کلیدهای اصلی بازگردانده شدند) ---
+// --- تنظیمات Supabase (اصلاح شده) ---
 const supabaseUrl = 'https://zzbnbsmywmpmkqhbloro.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6Ym5ic215d21wbWtxaGJsb3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODg1NjMsImV4cCI6MjA3OTc2NDU2M30.efyCqT9PLhy-1IPyMAadIzSjmhnIXEMZDOKN4F-P1_M';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+// تغییر مهم: اضافه کردن window.supabase برای جلوگیری از ارور
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // --- Elements ---
 const taskInput = document.getElementById('task-input');
@@ -55,8 +57,11 @@ let tasks = [];
 let currentUser = null;
 let isLoginMode = true;
 
+// --- شروع برنامه ---
 document.addEventListener('DOMContentLoaded', async () => {
     loadTheme();
+    
+    // بررسی نشست کاربر
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
         handleLoginSuccess(session.user);
@@ -67,15 +72,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // --- Theme Logic ---
 const themes = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316', '#6366f1', '#64748b'];
+
 function loadTheme() {
     const isDark = localStorage.getItem('dark-mode') === 'true';
     const color = localStorage.getItem('theme-color') || '#3b82f6';
+    
     if (isDark) document.body.classList.add('dark-mode');
-    themeToggle.innerHTML = isDark ? ICONS.sun : ICONS.moon;
+    
+    // اطمینان از وجود دکمه قبل از تغییر محتوا
+    if (themeToggle) {
+        themeToggle.innerHTML = isDark ? ICONS.sun : ICONS.moon;
+    }
+    
     document.documentElement.style.setProperty('--primary', color);
     renderColorGrid(color);
 }
+
 function renderColorGrid(selectedColor) {
+    if (!colorGrid) return;
     colorGrid.innerHTML = '';
     themes.forEach(color => {
         const div = document.createElement('div');
@@ -91,18 +105,21 @@ function renderColorGrid(selectedColor) {
         colorGrid.appendChild(div);
     });
 }
+
 themeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
     localStorage.setItem('dark-mode', isDark);
     themeToggle.innerHTML = isDark ? ICONS.sun : ICONS.moon;
 });
+
 colorPaletteBtn.addEventListener('click', () => openModal(themeModal));
 
 // --- Task Logic ---
 function renderTasks() {
     taskList.innerHTML = '';
     tasks.sort((a, b) => a.completed - b.completed); // مرتب‌سازی
+    
     const activeTasks = tasks.filter(t => !t.completed);
     const completedTasks = tasks.filter(t => t.completed);
 
@@ -112,6 +129,7 @@ function renderTasks() {
     }
 
     activeTasks.forEach(task => createTaskElement(task));
+    
     if (completedTasks.length > 0) {
         const separator = document.createElement('div');
         separator.className = 'list-separator';
@@ -124,33 +142,42 @@ function renderTasks() {
 function createTaskElement(task) {
     const li = document.createElement('li');
     if (task.completed) li.classList.add('completed');
+    
     li.innerHTML = `
         <div class="check-circle">${task.completed ? ICONS.check : ''}</div>
         <span>${task.task}</span>
         <button class="delete-btn">${ICONS.trash}</button>
     `;
+    
+    // ایونت لیسنر برای تیک زدن
     li.querySelector('.check-circle').addEventListener('click', async () => {
         task.completed = !task.completed;
+        renderTasks(); // آپدیت سریع UI
+        
         if (currentUser) {
             await supabase.from('todos').update({ is_complete: task.completed }).eq('id', task.id);
         } else {
             saveLocalTasks();
         }
-        renderTasks();
     });
+
+    // ایونت لیسنر برای حذف
     li.querySelector('.delete-btn').addEventListener('click', async () => {
         const confirm = await showConfirm('آیا از حذف این تسک مطمئن هستید؟');
         if (confirm) {
+            // حذف از آرایه محلی برای آپدیت سریع
+            const taskIndex = tasks.findIndex(t => t.id === task.id);
+            if (taskIndex > -1) tasks.splice(taskIndex, 1);
+            renderTasks();
+
             if (currentUser) {
                 await supabase.from('todos').delete().eq('id', task.id);
-                fetchTasks(); // دریافت مجدد برای اطمینان
             } else {
-                tasks = tasks.filter(t => t.id !== task.id);
                 saveLocalTasks();
-                renderTasks();
             }
         }
     });
+    
     taskList.appendChild(li);
 }
 
@@ -159,8 +186,9 @@ async function addTask() {
     if (!text) return;
     
     // حالت بهینه: ابتدا به لیست اضافه کن (Optimistic UI)
-    const tempTask = { id: Date.now(), task: text, completed: false };
-    tasks.unshift(tempTask); // اضافه به ابتدای آرایه
+    const tempId = Date.now();
+    const tempTask = { id: tempId, task: text, completed: false };
+    tasks.unshift(tempTask); 
     renderTasks();
     taskInput.value = '';
 
@@ -170,13 +198,15 @@ async function addTask() {
             .insert([{ task: text, user_id: currentUser.id, is_complete: false }])
             .select();
         
-        if (data) {
-            // جایگزینی تسک موقت با تسک واقعی دیتابیس
-            const idx = tasks.findIndex(t => t.id === tempTask.id);
-            if (idx !== -1) tasks[idx] = { id: data[0].id, task: data[0].task, completed: data[0].is_complete };
+        if (data && data.length > 0) {
+            // جایگزینی ID موقت با ID واقعی
+            const idx = tasks.findIndex(t => t.id === tempId);
+            if (idx !== -1) {
+                tasks[idx].id = data[0].id;
+            }
         } else if (error) {
             console.error(error);
-            showAlert('خطا در ذخیره تسک');
+            showAlert('خطا در ذخیره تسک در سرور');
         }
     } else {
         saveLocalTasks();
@@ -185,52 +215,84 @@ async function addTask() {
 
 addBtn.addEventListener('click', addTask);
 taskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTask(); });
+
 function saveLocalTasks() { localStorage.setItem('localTasks', JSON.stringify(tasks)); }
+
 function loadLocalTasks() {
     const stored = localStorage.getItem('localTasks');
     if (stored) tasks = JSON.parse(stored);
     renderTasks();
 }
 
-// --- User/Auth/Sync ---
+// --- User/Auth Logic ---
 async function handleLoginSuccess(user) {
     currentUser = user;
     closeModalFunc(authModal);
+    
     const { data: meta } = await supabase.from('users_meta').select('*').eq('user_id', user.id).single();
     let displayName = 'کاربر';
+    
     if (meta && meta.first_name) {
         headerTitle.textContent = `سلام ${meta.first_name} 👋`;
         displayName = meta.first_name + ' ' + meta.last_name;
     } else {
         headerTitle.textContent = 'لیست کارها';
     }
+    
     dropdownUsername.textContent = displayName;
     authBtn.classList.add('active');
+    
     await syncLocalTasksToCloud();
     fetchTasks();
 }
+
 async function syncLocalTasksToCloud() {
     const localTasks = JSON.parse(localStorage.getItem('localTasks') || '[]');
     if (localTasks.length > 0) {
-        const formattedTasks = localTasks.map(t => ({ task: t.task, is_complete: t.completed, user_id: currentUser.id }));
+        const formattedTasks = localTasks.map(t => ({ 
+            task: t.task, 
+            is_complete: t.completed, 
+            user_id: currentUser.id 
+        }));
+        
         await supabase.from('todos').insert(formattedTasks);
         localStorage.removeItem('localTasks');
-        showAlert('تسک‌های آفلاین با موفقیت همگام‌سازی شدند.');
+        showAlert('تسک‌های آفلاین شما ذخیره شدند.');
     }
 }
+
 async function fetchTasks() {
-    const { data, error } = await supabase.from('todos').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+    const { data, error } = await supabase
+        .from('todos')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+        
     if (data) {
         tasks = data.map(t => ({ id: t.id, task: t.task, completed: t.is_complete }));
         renderTasks();
     }
 }
 
-authBtn.addEventListener('click', (e) => { e.stopPropagation(); currentUser ? userDropdown.classList.toggle('show') : openModal(authModal); });
-window.addEventListener('click', () => { if (userDropdown.classList.contains('show')) userDropdown.classList.remove('show'); });
+// Auth Events
+authBtn.addEventListener('click', (e) => { 
+    e.stopPropagation(); 
+    if (currentUser) {
+        userDropdown.classList.toggle('show');
+    } else {
+        openModal(authModal);
+    }
+});
+
+window.addEventListener('click', () => { 
+    if (userDropdown.classList.contains('show')) userDropdown.classList.remove('show'); 
+});
+
 closeModal.addEventListener('click', () => closeModalFunc(authModal));
+
 switchAuthLink.addEventListener('click', (e) => {
-    e.preventDefault(); isLoginMode = !isLoginMode;
+    e.preventDefault(); 
+    isLoginMode = !isLoginMode;
     modalTitle.textContent = isLoginMode ? 'ورود به حساب' : 'ثبت نام';
     submitAuthBtn.textContent = isLoginMode ? 'ورود' : 'ثبت نام';
     document.getElementById('switch-text').textContent = isLoginMode ? 'حساب ندارید؟' : 'حساب دارید؟';
@@ -239,77 +301,163 @@ switchAuthLink.addEventListener('click', (e) => {
     signupFields.style.display = isLoginMode ? 'none' : 'flex';
     forgotPassLink.style.display = isLoginMode ? 'block' : 'none';
 });
+
 submitAuthBtn.addEventListener('click', async () => {
     const email = usernameInput.value.trim();
     const pass = passwordInput.value.trim();
     const fname = fnameInput.value.trim();
     const lname = lnameInput.value.trim();
+    
     if (!email || !pass) { authMsg.textContent = 'لطفا ایمیل و رمز را وارد کنید'; return; }
+    
     authMsg.textContent = 'لطفا صبر کنید...';
+    authMsg.style.color = 'var(--text)'; // رنگ عادی
+    
     if (isLoginMode) {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
-        error ? authMsg.textContent = error.message : handleLoginSuccess(data.user);
+        if (error) {
+            authMsg.textContent = 'اطلاعات اشتباه است';
+            authMsg.style.color = 'var(--danger)';
+        } else {
+            handleLoginSuccess(data.user);
+        }
     } else {
         if (!fname || !lname) { authMsg.textContent = 'نام و نام خانوادگی الزامی است'; return; }
-        const { data, error } = await supabase.auth.signUp({ email, password: pass, options: { data: { first_name: fname, last_name: lname } } });
-        if (error) { authMsg.textContent = error.message; } else {
-            if (data.user) await supabase.from('users_meta').insert([{ user_id: data.user.id, first_name: fname, last_name: lname }]);
-            handleLoginSuccess(data.user);
+        
+        const { data, error } = await supabase.auth.signUp({ 
+            email, 
+            password: pass, 
+            options: { data: { first_name: fname, last_name: lname } } 
+        });
+        
+        if (error) { 
+            authMsg.textContent = error.message; 
+        } else {
+            if (data.user) {
+                // ذخیره اطلاعات تکمیلی
+                await supabase.from('users_meta').insert([{ user_id: data.user.id, first_name: fname, last_name: lname }]);
+                handleLoginSuccess(data.user);
+            } else {
+                authMsg.textContent = 'لطفا ایمیل خود را تایید کنید.';
+            }
         }
     }
 });
+
 logoutBtn.addEventListener('click', async () => {
-    await supabase.auth.signOut(); currentUser = null;
-    authBtn.classList.remove('active'); headerTitle.textContent = 'لیست کارها';
-    tasks = []; loadLocalTasks();
+    await supabase.auth.signOut(); 
+    currentUser = null;
+    authBtn.classList.remove('active'); 
+    headerTitle.textContent = 'لیست کارها';
+    tasks = []; 
+    loadLocalTasks();
 });
+
+// Profile & Reset Pass Logic
 forgotPassLink.addEventListener('click', async (e) => {
-    e.preventDefault(); const email = usernameInput.value.trim();
-    if (!email) { authMsg.textContent = 'ایمیل خود را وارد کنید'; return; }
+    e.preventDefault(); 
+    const email = usernameInput.value.trim();
+    if (!email) { authMsg.textContent = 'برای بازیابی، ایمیل را وارد کنید'; return; }
     const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
-    error ? authMsg.textContent = error.message : showAlert('لینک بازیابی ارسال شد');
+    error ? authMsg.textContent = error.message : showAlert('لینک بازیابی به ایمیل شما ارسال شد');
 });
+
 editProfileBtn.addEventListener('click', async () => {
     const { data: meta } = await supabase.from('users_meta').select('*').eq('user_id', currentUser.id).single();
     if (meta) { editFname.value = meta.first_name; editLname.value = meta.last_name; }
-    editEmail.value = currentUser.email; openModal(profileModal);
+    editEmail.value = currentUser.email; 
+    openModal(profileModal);
 });
+
 closeProfileModal.addEventListener('click', () => closeModalFunc(profileModal));
+
 saveProfileBtn.addEventListener('click', async () => {
     const newFname = editFname.value.trim(), newLname = editLname.value.trim(), newEmail = editEmail.value.trim(), newPass = editPassword.value.trim();
     saveProfileBtn.textContent = 'در حال ذخیره...';
     try {
         if (newFname && newLname) {
             await supabase.from('users_meta').update({ first_name: newFname, last_name: newLname }).eq('user_id', currentUser.id);
-            headerTitle.textContent = `سلام ${newFname} 👋`; dropdownUsername.textContent = newFname + ' ' + newLname;
+            headerTitle.textContent = `سلام ${newFname} 👋`; 
+            dropdownUsername.textContent = newFname + ' ' + newLname;
         }
-        if (newEmail && newEmail !== currentUser.email) { const { error } = await supabase.auth.updateUser({ email: newEmail }); if (error) throw error; showAlert('ایمیل تغییر کرد. لطفا تایید کنید.'); }
-        if (newPass) { const { error } = await supabase.auth.updateUser({ password: newPass }); if (error) throw error; }
-        closeModalFunc(profileModal); showAlert('تغییرات ذخیره شد');
-    } catch (e) { showAlert('خطا: ' + e.message); } finally { saveProfileBtn.textContent = 'ذخیره تغییرات'; }
+        if (newEmail && newEmail !== currentUser.email) { 
+            const { error } = await supabase.auth.updateUser({ email: newEmail }); 
+            if (error) throw error; 
+            showAlert('ایمیل تغییر کرد. لطفا تایید کنید.'); 
+        }
+        if (newPass) { 
+            const { error } = await supabase.auth.updateUser({ password: newPass }); 
+            if (error) throw error; 
+        }
+        closeModalFunc(profileModal); 
+        showAlert('تغییرات ذخیره شد');
+    } catch (e) { 
+        showAlert('خطا: ' + e.message); 
+    } finally { 
+        saveProfileBtn.textContent = 'ذخیره تغییرات'; 
+    }
 });
 
-function openModal(m) { m.classList.add('open'); }
-function closeModalFunc(m) { m.classList.remove('open'); }
+// --- Modal Functions ---
+function openModal(m) { 
+    m.style.display = 'flex'; // ابتدا دیسپلی
+    setTimeout(() => m.classList.add('open'), 10); // سپس انیمیشن
+}
+
+function closeModalFunc(m) { 
+    m.classList.remove('open'); 
+    setTimeout(() => m.style.display = 'none', 300); // حذف دیسپلی بعد از انیمیشن
+}
+
 function showAlert(msg, title = 'پیام') {
     return new Promise((resolve) => {
         document.getElementById('alert-title').textContent = title;
         document.getElementById('alert-text').textContent = msg;
-        document.getElementById('alert-ok-btn').textContent = 'باشه';
-        document.getElementById('alert-cancel-btn').style.display = 'none';
+        const okBtn = document.getElementById('alert-ok-btn');
+        const cancelBtn = document.getElementById('alert-cancel-btn');
+        
+        okBtn.textContent = 'باشه';
+        cancelBtn.style.display = 'none';
+        
         openModal(document.getElementById('alert-modal'));
-        document.getElementById('alert-ok-btn').onclick = () => { closeModalFunc(document.getElementById('alert-modal')); resolve(true); };
+        
+        // حذف لیسنرهای قبلی با کلون کردن
+        const newOkBtn = okBtn.cloneNode(true);
+        okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+        
+        newOkBtn.onclick = () => { 
+            closeModalFunc(document.getElementById('alert-modal')); 
+            resolve(true); 
+        };
     });
 }
+
 function showConfirm(msg) {
     return new Promise((resolve) => {
-        document.getElementById('alert-title').textContent = 'تایید حذف';
+        document.getElementById('alert-title').textContent = 'تایید عملیات';
         document.getElementById('alert-text').textContent = msg;
-        document.getElementById('alert-ok-btn').textContent = 'بله، حذف شود';
-        const cancel = document.getElementById('alert-cancel-btn');
-        cancel.style.display = 'block';
+        
+        const okBtn = document.getElementById('alert-ok-btn');
+        const cancelBtn = document.getElementById('alert-cancel-btn');
+        
+        okBtn.textContent = 'بله، حذف شود';
+        cancelBtn.style.display = 'inline-block';
+        
         openModal(document.getElementById('alert-modal'));
-        document.getElementById('alert-ok-btn').onclick = () => { closeModalFunc(document.getElementById('alert-modal')); resolve(true); };
-        cancel.onclick = () => { closeModalFunc(document.getElementById('alert-modal')); resolve(false); };
+        
+        // ریست کردن لیسنرها
+        const newOkBtn = okBtn.cloneNode(true);
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+        
+        newOkBtn.onclick = () => { 
+            closeModalFunc(document.getElementById('alert-modal')); 
+            resolve(true); 
+        };
+        newCancelBtn.onclick = () => { 
+            closeModalFunc(document.getElementById('alert-modal')); 
+            resolve(false); 
+        };
     });
 }
