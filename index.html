@@ -4,36 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>تسکیو | مدیریت وظایف</title>
-    
-    <!-- Favicon (تیک سفید در دایره آبی) -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233b82f6'%3E%3Ccircle cx='12' cy='12' r='12'/%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z' fill='white'/%3E%3C/svg%3E">
-
-    <!-- فونت وزیرمتن (CDN) -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="app-wrapper">
     <div class="container">
-        <!-- هدر -->
+        <!-- هدر اصلاح شده: اول تایتل (راست)، بعد دکمه‌ها (چپ) -->
         <header>
+            <h1 id="header-title">لیست کارها</h1>
+            
             <div class="header-controls">
                 <button id="theme-toggle" class="icon-btn" title="تغییر تم">
-                    <!-- آیکون ماه/خورشید با JS پر می‌شود -->
+                    <!-- آیکون توسط JS پر می‌شود -->
                 </button>
                 <button id="color-palette-btn" class="icon-btn" title="رنگ‌بندی">
-                    <!-- آیکون پالت -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
                 </button>
                 
-                <!-- منوی کاربری -->
+                <!-- کانتینر منوی کاربر -->
                 <div class="user-menu-container">
                     <button id="auth-btn" class="icon-btn" title="حساب کاربری">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     </button>
-                    <!-- منوی کشویی -->
                     <div id="user-dropdown" class="dropdown-menu">
                         <div class="dropdown-header" id="dropdown-username">کاربر مهمان</div>
                         <button class="dropdown-item" id="edit-profile-btn">ویرایش اطلاعات</button>
@@ -41,15 +36,13 @@
                     </div>
                 </div>
             </div>
-
-            <h1 id="header-title">لیست کارها</h1>
         </header>
 
-        <!-- ورودی تسک جدید -->
+        <!-- ورودی تسک -->
         <div class="input-group">
             <input type="text" id="task-input" placeholder="کار جدید را بنویسید...">
             <button id="add-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             </button>
         </div>
 
@@ -58,22 +51,18 @@
     </div>
 </div>
 
-<!-- مودال انتخاب رنگ (Theme Picker Modal) -->
+<!-- مودال‌ها (بدون تغییر ساختاری، فقط برای اطمینان کپی کنید) -->
 <div id="theme-modal" class="modal-overlay">
     <div class="modal-box">
         <h3>انتخاب رنگ تم</h3>
-        <div id="color-grid" class="color-grid">
-            <!-- رنگ‌ها با JS ساخته می‌شوند -->
-        </div>
+        <div id="color-grid" class="color-grid"></div>
         <button class="cancel-btn" onclick="document.getElementById('theme-modal').classList.remove('open')">بستن</button>
     </div>
 </div>
 
-<!-- مودال احراز هویت (Login/Signup) -->
 <div id="auth-modal" class="modal-overlay">
     <div class="modal-box">
         <h2 id="modal-title" style="margin-bottom: 20px;">ورود به حساب</h2>
-        
         <div class="modal-inputs">
             <div id="signup-fields" style="display: none; gap: 10px; flex-direction: column;">
                 <input type="text" id="fname-input" placeholder="نام کوچک (فارسی)">
@@ -82,11 +71,8 @@
             <input type="text" id="username-input" placeholder="ایمیل" style="text-align: left;" dir="ltr">
             <input type="password" id="password-input" placeholder="رمز عبور" style="text-align: left;" dir="ltr">
         </div>
-
         <div id="auth-msg" style="color: var(--danger); margin-bottom: 10px; font-size: 0.9rem;"></div>
-
         <button id="submit-auth-btn" class="primary-btn">ورود</button>
-        
         <div style="margin-top: 15px; font-size: 0.9rem;">
             <span id="switch-text" style="color: var(--text-light);">حساب ندارید؟</span>
             <a href="#" id="switch-auth-link" style="color: var(--primary); text-decoration: none; font-weight: bold;">ثبت نام</a>
@@ -94,36 +80,28 @@
         <div style="margin-top: 10px; font-size: 0.85rem;">
              <a href="#" id="forgot-pass-link" style="color: var(--text-light); text-decoration: none;">فراموشی رمز عبور</a>
         </div>
-
         <button id="close-modal" class="close-modal-x">×</button>
     </div>
 </div>
 
-<!-- مودال ویرایش پروفایل -->
 <div id="profile-modal" class="modal-overlay">
     <div class="modal-box">
         <h2 style="margin-bottom: 20px;">ویرایش اطلاعات</h2>
-        
         <div class="modal-inputs">
             <label style="text-align: right; font-size: 0.85rem; color: var(--text-light); margin-bottom: 5px;">نام کوچک</label>
             <input type="text" id="edit-fname" placeholder="نام کوچک">
-
             <label style="text-align: right; font-size: 0.85rem; color: var(--text-light); margin-bottom: 5px;">نام خانوادگی</label>
             <input type="text" id="edit-lname" placeholder="نام خانوادگی">
-            
             <label style="text-align: right; font-size: 0.85rem; color: var(--text-light); margin-top: 10px; margin-bottom: 5px;">ایمیل جدید (اختیاری)</label>
             <input type="text" id="edit-email" placeholder="ایمیل" style="text-align: left;" dir="ltr">
-            
             <label style="text-align: right; font-size: 0.85rem; color: var(--text-light); margin-top: 10px; margin-bottom: 5px;">رمز عبور جدید (اختیاری)</label>
             <input type="password" id="edit-password" placeholder="خالی بگذارید تا تغییر نکند" style="text-align: left;" dir="ltr">
         </div>
-
         <button id="save-profile-btn" class="primary-btn">ذخیره تغییرات</button>
         <button id="close-profile-modal" class="secondary-btn" style="margin-top: 10px;">انصراف</button>
     </div>
 </div>
 
-<!-- مودال تایید و پیام (Alert/Confirm) -->
 <div id="alert-modal" class="modal-overlay">
     <div class="modal-box">
         <h3 id="alert-title" style="margin-bottom: 10px;">پیام</h3>
