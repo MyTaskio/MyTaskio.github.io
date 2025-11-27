@@ -6,9 +6,8 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // --- متغیرها ---
 let tasks = [];
 let currentUser = null;
-let isLoginMode = true;
+let authMode = 'login'; // login | signup | edit
 
-// 10 رنگ انتخابی
 const THEME_COLORS = [
     '#FFA500', '#2196F3', '#4CAF50', '#E91E63', '#9C27B0', 
     '#F44336', '#00BCD4', '#FFC107', '#795548', '#607D8B'
@@ -25,6 +24,7 @@ const els = {
     closeModal: document.querySelector('.close-modal'),
     submitAuthBtn: document.getElementById('submit-auth-btn'),
     switchAuthLink: document.getElementById('switch-auth-link'),
+    authFooterLinks: document.getElementById('auth-footer-links'),
     modalTitle: document.getElementById('modal-title'),
     fnameInput: document.getElementById('fname-input'),
     lnameInput: document.getElementById('lname-input'),
@@ -43,7 +43,6 @@ const els = {
 document.addEventListener('DOMContentLoaded', async () => {
     loadLocalSettings();
     
-    // بستن منو با کلیک بیرون
     window.addEventListener('click', (e) => {
         if (!els.menuBtn.contains(e.target) && !els.dropdown.contains(e.target)) {
             els.dropdown.classList.remove('show');
@@ -51,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     els.menuBtn.addEventListener('click', () => {
-        renderMenu(); // ساخت منو قبل از نمایش
+        renderMenu(); 
         els.dropdown.classList.toggle('show');
     });
 
@@ -59,54 +58,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (session) {
         setCurrentUser(session.user);
     } else {
-        els.headerTitle.textContent = 'سلام کاربر مهمان';
+        els.headerTitle.textContent = 'وظایف من';
         const localData = localStorage.getItem('todo_local_tasks');
         if (localData) tasks = JSON.parse(localData);
         renderTasks();
     }
 });
 
-// --- ساخت داینامیک منوی تنظیمات ---
+// --- منو ---
 function renderMenu() {
     const isDark = document.body.classList.contains('dark-mode');
     let menuHTML = '';
 
-    // 1. دکمه اول: ورود/ثبت نام یا اسم کاربر
     if (currentUser) {
-        const name = currentUser.user_metadata.first_name + ' ' + currentUser.user_metadata.last_name;
+        // فقط نام و نام خانوادگی یکبار نمایش داده می‌شود
+        const meta = currentUser.user_metadata || {};
+        const fullName = (meta.first_name || '') + ' ' + (meta.last_name || '');
+        
         menuHTML += `
-            <div class="menu-item" style="cursor:default; font-weight:bold; border-bottom:1px solid var(--border-color);">
-                <span>${name}</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <div class="menu-item" onclick="openEditProfile()" style="border-bottom:1px solid var(--border-color);">
+                <span>${fullName || 'کاربر ناشناس'}</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
             </div>
         `;
     } else {
         menuHTML += `
-            <div class="menu-item" onclick="openAuthModal()">
+            <div class="menu-item" onclick="openAuthModal('login')">
                 <span>ورود یا ثبت نام</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
             </div>
         `;
     }
 
-    // 2. رنگ‌ها (گرید)
     menuHTML += `<div class="color-grid">`;
     THEME_COLORS.forEach(color => {
         menuHTML += `<div class="color-circle" style="background:${color}" onclick="setTheme('${color}')"></div>`;
     });
     menuHTML += `</div>`;
 
-    // 3. دارک مود
     menuHTML += `
         <div class="menu-item" onclick="toggleDarkMode()">
             <span>${isDark ? 'حالت روز' : 'حالت شب'}</span>
-            ${isDark 
-                ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>' 
-                : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>'}
+            ${isDark ? '☀️' : '🌙'}
         </div>
     `;
 
-    // 4. حذف همه تسک‌ها
     menuHTML += `
         <div class="menu-item danger" onclick="deleteAllTasks()">
             <span>حذف همه تسک‌ها</span>
@@ -114,7 +110,6 @@ function renderMenu() {
         </div>
     `;
 
-    // 5. خروج (فقط اگر لاگین باشد)
     if (currentUser) {
         menuHTML += `
             <div class="menu-item danger" onclick="logoutUser()">
@@ -133,10 +128,12 @@ async function setCurrentUser(user) {
     const meta = user.user_metadata || {};
     const firstName = meta.first_name || 'کاربر';
     
-    els.headerTitle.textContent = `سلام ${firstName}`; // فقط نام کوچک
+    // تغییر به حالت سلام + اسم کوچک + ایموجی
+    els.headerTitle.textContent = `سلام ${firstName} 👋`;
+    
     closeModalFunc(els.authModal);
     
-    // سینک تسک‌های لوکال
+    // سینک
     const localData = localStorage.getItem('todo_local_tasks');
     if (localData) {
         const localTasks = JSON.parse(localData);
@@ -148,11 +145,10 @@ async function setCurrentUser(user) {
             localStorage.removeItem('todo_local_tasks');
         }
     }
-    
     fetchTasks();
 }
 
-// --- رندر لیست تسک‌ها (با جداکننده) ---
+// --- تسک‌ها ---
 function renderTasks() {
     els.todoList.innerHTML = '';
 
@@ -161,48 +157,37 @@ function renderTasks() {
         return;
     }
 
-    // جدا کردن تسک‌ها
     const activeTasks = tasks.filter(t => !t.is_completed);
     const completedTasks = tasks.filter(t => t.is_completed);
 
-    // رندر تسک‌های فعال
-    activeTasks.forEach(task => {
-        els.todoList.appendChild(createTaskElement(task));
-    });
+    activeTasks.forEach(task => els.todoList.appendChild(createTaskElement(task)));
 
-    // اگر تسک تکمیل شده داریم، جداکننده و لیست پایین را اضافه کن
     if (completedTasks.length > 0) {
-        // اگر تسک فعال هم داشتیم، جداکننده بزن، اگر نه فقط لیست
         if (activeTasks.length > 0) {
             const separator = document.createElement('div');
             separator.className = 'completed-section';
             separator.innerHTML = '<span class="completed-label">انجام شده</span>';
             els.todoList.appendChild(separator);
         }
-        
-        completedTasks.forEach(task => {
-            els.todoList.appendChild(createTaskElement(task));
-        });
+        completedTasks.forEach(task => els.todoList.appendChild(createTaskElement(task)));
     }
 }
 
 function createTaskElement(task) {
     const li = document.createElement('li');
     li.className = `task-item ${task.is_completed ? 'completed' : ''}`;
-    
     li.innerHTML = `
         <div class="task-left">
             <div class="check-circle ${task.is_completed ? 'checked' : ''}" onclick="toggleTask(${task.id})"></div>
             <span class="task-text" onclick="toggleTask(${task.id})">${task.task}</span>
         </div>
         <button class="delete-btn" onclick="deleteTask(${task.id})">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
         </button>
     `;
     return li;
 }
 
-// --- عملیات تسک (CRUD) ---
 els.addBtn.addEventListener('click', addNewTask);
 els.todoInput.addEventListener('keypress', (e) => e.key === 'Enter' && addNewTask());
 
@@ -231,43 +216,132 @@ async function addNewTask() {
 async function toggleTask(id) {
     const index = tasks.findIndex(t => t.id === id);
     if (index === -1) return;
-
     tasks[index].is_completed = !tasks[index].is_completed;
-    renderTasks(); // خودکار میره پایین چون لیست بازسازی میشه
-
-    if (currentUser) {
-        await supabase.from('todos').update({ is_completed: tasks[index].is_completed }).eq('id', id);
-    } else {
-        saveLocal();
-    }
+    renderTasks();
+    if (currentUser) await supabase.from('todos').update({ is_completed: tasks[index].is_completed }).eq('id', id);
+    else saveLocal();
 }
 
 async function deleteTask(id) {
     if (!await showConfirm('این تسک حذف شود؟')) return;
-
     tasks = tasks.filter(t => t.id !== id);
     renderTasks();
-
-    if (currentUser) {
-        await supabase.from('todos').delete().eq('id', id);
-    } else {
-        saveLocal();
-    }
+    if (currentUser) await supabase.from('todos').delete().eq('id', id);
+    else saveLocal();
 }
 
-// --- توابع منو ---
-function openAuthModal() {
+// --- مودال و Auth ---
+function openAuthModal(mode) {
+    authMode = mode;
     els.dropdown.classList.remove('show');
+    els.authMsg.textContent = '';
+    
+    // ریست فیلدها
+    els.usernameInput.value = '';
+    els.passwordInput.value = '';
+    els.fnameInput.value = '';
+    els.lnameInput.value = '';
+
+    if (mode === 'login') {
+        els.modalTitle.textContent = 'ورود به حساب';
+        els.submitAuthBtn.textContent = 'ورود';
+        els.signupFields.style.display = 'none';
+        els.usernameInput.parentElement.style.display = 'block'; // نمایش ایمیل
+        els.authFooterLinks.style.display = 'flex';
+        document.getElementById('switch-text').textContent = 'حساب ندارید؟';
+        els.switchAuthLink.textContent = 'ثبت نام';
+    } else if (mode === 'signup') {
+        els.modalTitle.textContent = 'ثبت نام کاربر جدید';
+        els.submitAuthBtn.textContent = 'ثبت نام';
+        els.signupFields.style.display = 'block';
+        els.authFooterLinks.style.display = 'flex';
+        document.getElementById('switch-text').textContent = 'حساب دارید؟';
+        els.switchAuthLink.textContent = 'ورود';
+    }
     openModal(els.authModal);
 }
 
+function openEditProfile() {
+    authMode = 'edit';
+    els.dropdown.classList.remove('show');
+    
+    els.modalTitle.textContent = 'ویرایش مشخصات';
+    els.submitAuthBtn.textContent = 'ذخیره تغییرات';
+    els.signupFields.style.display = 'block';
+    els.authFooterLinks.style.display = 'none'; // مخفی کردن لینک سوییچ
+    
+    // پر کردن اطلاعات فعلی
+    const meta = currentUser.user_metadata || {};
+    els.fnameInput.value = meta.first_name || '';
+    els.lnameInput.value = meta.last_name || '';
+    els.usernameInput.parentElement.style.display = 'none'; // ایمیل در ویرایش مخفی (یا نمایشی)
+    // ایمیل و پسورد رو مخفی میکنیم برای سادگی چون تغییرشون پروسه داره
+    els.usernameInput.style.display = 'none';
+    els.passwordInput.style.display = 'none';
+
+    openModal(els.authModal);
+}
+
+els.switchAuthLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    openAuthModal(authMode === 'login' ? 'signup' : 'login');
+});
+
+els.submitAuthBtn.addEventListener('click', async () => {
+    if (authMode === 'edit') {
+        // لاجیک ویرایش
+        const fname = els.fnameInput.value.trim();
+        const lname = els.lnameInput.value.trim();
+        if(!fname) return els.authMsg.textContent = 'نام الزامی است';
+        
+        els.submitAuthBtn.textContent = '...';
+        const { data, error } = await supabase.auth.updateUser({
+            data: { first_name: fname, last_name: lname }
+        });
+        
+        if(error) els.authMsg.textContent = error.message;
+        else {
+            setCurrentUser(data.user);
+            showAlert('مشخصات بروز شد');
+        }
+        return;
+    }
+
+    // لاجیک ورود/ثبت نام
+    const email = els.usernameInput.value.trim();
+    const password = els.passwordInput.value.trim();
+    const fname = els.fnameInput.value.trim();
+    const lname = els.lnameInput.value.trim();
+
+    if (!email || !password) return els.authMsg.textContent = 'ایمیل و رمز الزامی است';
+    
+    els.submitAuthBtn.textContent = '...';
+    
+    if (authMode === 'login') {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) els.authMsg.textContent = 'اطلاعات اشتباه است';
+        else setCurrentUser(data.user);
+    } else {
+        const { error } = await supabase.auth.signUp({
+            email, password,
+            options: { data: { first_name: fname, last_name: lname } }
+        });
+        if (error) els.authMsg.textContent = error.message;
+        else {
+            showAlert('ثبت نام انجام شد. وارد شوید.');
+            openAuthModal('login');
+        }
+    }
+});
+
+// --- سایر ---
 async function logoutUser() {
     await supabase.auth.signOut();
     currentUser = null;
     tasks = [];
-    els.headerTitle.textContent = 'سلام کاربر مهمان';
+    els.headerTitle.textContent = 'وظایف من';
     els.dropdown.classList.remove('show');
-    saveLocal(); // پاک کردن لوکال یا بازگشت به حالت مهمان
+    saveLocal(); 
     renderTasks();
     showAlert('خروج موفقیت آمیز بود');
 }
@@ -275,10 +349,7 @@ async function logoutUser() {
 async function deleteAllTasks() {
     if (tasks.length === 0) return;
     if (!await showConfirm('همه تسک‌ها پاک شوند؟')) return;
-
-    if (currentUser) {
-        await supabase.from('todos').delete().neq('id', 0);
-    }
+    if (currentUser) await supabase.from('todos').delete().neq('id', 0);
     tasks = [];
     saveLocal();
     renderTasks();
@@ -292,12 +363,10 @@ function setTheme(color) {
 
 function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('dark_mode', isDark);
-    renderMenu(); // برای آپدیت آیکون منو
+    localStorage.setItem('dark_mode', document.body.classList.contains('dark-mode'));
+    renderMenu();
 }
 
-// --- دیتابیس و ابزارها ---
 async function fetchTasks() {
     els.todoList.innerHTML = '<div style="text-align:center; padding:20px;">در حال بارگذاری...</div>';
     const { data } = await supabase.from('todos').select('*').order('created_at', { ascending: false });
@@ -315,48 +384,13 @@ function loadLocalSettings() {
     if (localStorage.getItem('dark_mode') === 'true') document.body.classList.add('dark-mode');
 }
 
-// --- لاجیک مودال‌ها ---
-els.switchAuthLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    isLoginMode = !isLoginMode;
-    els.modalTitle.textContent = isLoginMode ? 'ورود به حساب' : 'ثبت نام';
-    els.submitAuthBtn.textContent = isLoginMode ? 'ورود' : 'ثبت نام';
-    document.getElementById('switch-text').textContent = isLoginMode ? 'حساب ندارید؟' : 'حساب دارید؟';
-    els.switchAuthLink.textContent = isLoginMode ? 'ثبت نام کنید' : 'وارد شوید';
-    els.signupFields.style.display = isLoginMode ? 'none' : 'block';
-    els.authMsg.textContent = '';
-});
-
-els.submitAuthBtn.addEventListener('click', async () => {
-    const email = els.usernameInput.value.trim();
-    const password = els.passwordInput.value.trim();
-    const fname = els.fnameInput.value.trim();
-    const lname = els.lnameInput.value.trim();
-
-    if (!email || !password) return els.authMsg.textContent = 'ایمیل و رمز الزامی است';
-
-    els.submitAuthBtn.textContent = '...';
-    
-    if (isLoginMode) {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) els.authMsg.textContent = 'اطلاعات اشتباه است';
-        else setCurrentUser(data.user);
-    } else {
-        const { error } = await supabase.auth.signUp({
-            email, password,
-            options: { data: { first_name: fname, last_name: lname } }
-        });
-        if (error) els.authMsg.textContent = error.message;
-        else {
-            showAlert('ثبت نام انجام شد. وارد شوید.');
-            isLoginMode = true; els.switchAuthLink.click();
-        }
-    }
-    els.submitAuthBtn.textContent = isLoginMode ? 'ورود' : 'ثبت نام';
-});
-
 function openModal(modal) { modal.classList.add('open'); }
-function closeModalFunc(modal) { modal.classList.remove('open'); }
+function closeModalFunc(modal) { 
+    modal.classList.remove('open'); 
+    // برگرداندن استایل فیلدها برای دفعه بعد
+    els.usernameInput.style.display = 'block';
+    els.passwordInput.style.display = 'block';
+}
 els.closeModal.addEventListener('click', () => closeModalFunc(els.authModal));
 
 function showAlert(msg) {
@@ -375,8 +409,9 @@ function showConfirm(msg) {
     });
 }
 
-// اتصال توابع به window برای دسترسی از HTML
+// Global Access
 window.openAuthModal = openAuthModal;
+window.openEditProfile = openEditProfile;
 window.logoutUser = logoutUser;
 window.deleteAllTasks = deleteAllTasks;
 window.toggleDarkMode = toggleDarkMode;
