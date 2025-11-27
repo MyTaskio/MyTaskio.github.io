@@ -3,12 +3,20 @@ const SUPABASE_URL = 'https://zzbnbsmywmpmkqhbloro.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6Ym5ic215d21wbWtxaGJsb3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODg1NjMsImV4cCI6MjA3OTc2NDU2M30.efyCqT9PLhy-1IPyMAadIzSjmhnIXEMZDOKN4F-P1_M';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// --- آیکون‌های SVG ---
+const ICONS = {
+    moon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>',
+    sun: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>',
+    check: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+    trash: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>'
+};
+
 // --- متغیرها ---
 let tasks = [];
 let currentUser = null;
-let isLoginMode = true; // حالت پیش‌فرض مودال: ورود
+let isLoginMode = true;
 
-// --- انتخابگرها (Selectors) ---
+// --- انتخابگرها ---
 const todoInput = document.getElementById('todo-input');
 const addBtn = document.getElementById('add-btn');
 const todoList = document.getElementById('todo-list');
@@ -31,12 +39,10 @@ const logoutBtn = document.getElementById('logout-btn');
 document.addEventListener('DOMContentLoaded', async () => {
     loadLocalSettings();
     
-    // چک کردن سشن کاربر
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
         setCurrentUser(session.user);
     } else {
-        // اگر لاگین نبود، لوکال را بارگذاری کن
         const localData = localStorage.getItem('todo_local_tasks');
         if (localData) tasks = JSON.parse(localData);
         renderTasks();
@@ -47,19 +53,15 @@ function setCurrentUser(user) {
     currentUser = user;
     userStatusBar.style.display = 'flex';
     userDisplayName.textContent = user.user_metadata.username || 'کاربر';
-    authBtn.style.color = '#10b981'; // سبز شدن آیکون
+    authBtn.style.color = 'var(--primary)';
+    authBtn.style.borderColor = 'var(--primary)';
     fetchTasks();
 }
 
-// --- توابع دیتابیس و تسک ---
-
-// دریافت تسک‌ها از Supabase
+// --- دیتابیس ---
 async function fetchTasks() {
-    todoList.innerHTML = '<div style="text-align:center; padding:20px;">در حال دریافت...</div>';
-    const { data, error } = await supabase
-        .from('todos')
-        .select('*')
-        .order('created_at', { ascending: false });
+    todoList.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-light)">در حال بارگذاری...</div>';
+    const { data, error } = await supabase.from('todos').select('*').order('created_at', { ascending: false });
 
     if (!error) {
         tasks = data;
@@ -67,7 +69,7 @@ async function fetchTasks() {
     }
 }
 
-// افزودن تسک
+// --- توابع تسک ---
 addBtn.addEventListener('click', addNewTask);
 todoInput.addEventListener('keypress', (e) => e.key === 'Enter' && addNewTask());
 
@@ -78,19 +80,13 @@ async function addNewTask() {
     const tempId = Date.now();
     const newTask = { id: tempId, task: text, is_completed: false };
 
-    // نمایش فوری (Optimistic UI)
     tasks.unshift(newTask);
     renderTasks();
     todoInput.value = '';
 
     if (currentUser) {
-        const { data, error } = await supabase
-            .from('todos')
-            .insert([{ task: text, user_id: currentUser.id }])
-            .select();
-        
+        const { data, error } = await supabase.from('todos').insert([{ task: text, user_id: currentUser.id }]).select();
         if (!error && data) {
-            // بروزرسانی ID موقت با ID واقعی دیتابیس
             const index = tasks.findIndex(t => t.id === tempId);
             if (index !== -1) tasks[index] = data[0];
         }
@@ -99,25 +95,22 @@ async function addNewTask() {
     }
 }
 
-// تغییر وضعیت (تیک زدن)
 async function toggleTask(id) {
     const index = tasks.findIndex(t => t.id === id);
     if (index === -1) return;
 
-    const newState = !tasks[index].is_completed;
-    tasks[index].is_completed = newState;
+    tasks[index].is_completed = !tasks[index].is_completed;
     renderTasks();
 
     if (currentUser) {
-        await supabase.from('todos').update({ is_completed: newState }).eq('id', id);
+        await supabase.from('todos').update({ is_completed: tasks[index].is_completed }).eq('id', id);
     } else {
         saveLocal();
     }
 }
 
-// حذف تسک
 async function deleteTask(id) {
-    if (!confirm('آیا مطمئن هستید؟')) return;
+    if (!confirm('حذف شود؟')) return;
 
     tasks = tasks.filter(t => t.id !== id);
     renderTasks();
@@ -129,12 +122,11 @@ async function deleteTask(id) {
     }
 }
 
-// ذخیره در لوکال استوریج (برای مهمان)
 function saveLocal() {
     localStorage.setItem('todo_local_tasks', JSON.stringify(tasks));
 }
 
-// --- رندر کردن لیست (UI) ---
+// --- رندرینگ (UI) ---
 function renderTasks() {
     todoList.innerHTML = '';
     
@@ -142,19 +134,17 @@ function renderTasks() {
     const completed = tasks.filter(t => t.is_completed);
 
     if (active.length === 0 && completed.length === 0) {
-        todoList.innerHTML = '<div style="text-align:center; opacity:0.6; margin-top:20px;">لیست خالی است</div>';
+        todoList.innerHTML = '<div style="text-align:center; opacity:0.5; margin-top:30px;">لیست خالی است</div>';
         return;
     }
 
-    // رندر فعال‌ها
     active.forEach(task => createEl(task));
 
-    // جداکننده و تکمیل شده‌ها
     if (completed.length > 0) {
         if (active.length > 0) {
             const sep = document.createElement('div');
             sep.className = 'list-separator';
-            sep.textContent = 'تکمیل شده';
+            sep.innerHTML = '<span>انجام شده</span>';
             todoList.appendChild(sep);
         }
         completed.forEach(task => createEl(task));
@@ -166,16 +156,18 @@ function createEl(task) {
     if (task.is_completed) li.classList.add('completed');
 
     li.innerHTML = `
-        <div class="check-circle ${task.is_completed ? 'checked' : ''}" onclick="toggleTask(${task.id})"></div>
+        <div class="check-circle" onclick="toggleTask(${task.id})">
+            ${ICONS.check}
+        </div>
         <span>${task.task}</span>
         <button class="delete-btn" onclick="deleteTask(${task.id})">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            ${ICONS.trash}
         </button>
     `;
     todoList.appendChild(li);
 }
 
-// --- مدیریت تم و رنگ ---
+// --- تم و رنگ ---
 function loadLocalSettings() {
     const theme = localStorage.getItem('theme_color');
     const isDark = localStorage.getItem('dark_mode') === 'true';
@@ -187,16 +179,16 @@ function loadLocalSettings() {
     
     if (isDark) {
         document.body.classList.add('dark-mode');
-        themeToggle.textContent = '☀️';
+        themeToggle.innerHTML = ICONS.sun; // تغییر آیکون به خورشید
     } else {
-        themeToggle.textContent = '🌙';
+        themeToggle.innerHTML = ICONS.moon; // تغییر آیکون به ماه
     }
 }
 
 themeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
-    themeToggle.textContent = isDark ? '☀️' : '🌙';
+    themeToggle.innerHTML = isDark ? ICONS.sun : ICONS.moon;
     localStorage.setItem('dark_mode', isDark);
 });
 
@@ -206,89 +198,72 @@ colorPicker.addEventListener('input', (e) => {
     localStorage.setItem('theme_color', color);
 });
 
-// --- احراز هویت (Auth) ---
+// --- مدیریت مودال و احراز هویت ---
 authBtn.addEventListener('click', () => {
-    if (currentUser) return; // اگر لاگین بود کاری نکن (دکمه خروج جداست)
+    if (currentUser) return; 
     authModal.style.display = 'flex';
 });
 
 closeModal.addEventListener('click', () => authModal.style.display = 'none');
 window.onclick = (e) => { if (e.target == authModal) authModal.style.display = 'none'; };
 
-// سوئیچ بین لاگین و ثبت نام
 switchAuthLink.addEventListener('click', (e) => {
     e.preventDefault();
     isLoginMode = !isLoginMode;
-    modalTitle.textContent = isLoginMode ? 'ورود به حساب' : 'ثبت نام کاربر جدید';
+    modalTitle.textContent = isLoginMode ? 'ورود به حساب' : 'ثبت نام';
     submitAuthBtn.textContent = isLoginMode ? 'ورود' : 'ثبت نام';
     document.getElementById('switch-text').textContent = isLoginMode ? 'حساب ندارید؟' : 'حساب دارید؟';
-    switchAuthLink.textContent = isLoginMode ? 'ثبت نام کنید' : 'وارد شوید';
+    switchAuthLink.textContent = isLoginMode ? 'ثبت نام' : 'ورود';
     authMsg.textContent = '';
 });
 
-// لاجیک اصلی ورود/ثبت نام
 submitAuthBtn.addEventListener('click', async () => {
     const user = usernameInput.value.trim();
     const pass = passwordInput.value.trim();
     
     if (user.length < 3 || pass.length < 4) {
-        authMsg.textContent = 'نام کاربری حداقل ۳ و رمز ۴ کاراکتر';
+        authMsg.style.color = 'var(--danger)';
+        authMsg.textContent = 'نام کاربری (۳) و رمز (۴) کاراکتر';
         return;
     }
 
+    authMsg.style.color = 'var(--text)';
     authMsg.textContent = 'لطفا صبر کنید...';
-    authMsg.style.color = 'var(--text-color)';
 
-    // ساخت ایمیل فیک برای دور زدن نیاز به ایمیل واقعی
     const fakeEmail = `${user}@example.com`;
-
     let result;
+
     if (isLoginMode) {
-        result = await supabase.auth.signInWithPassword({
-            email: fakeEmail,
-            password: pass
-        });
+        result = await supabase.auth.signInWithPassword({ email: fakeEmail, password: pass });
     } else {
-        result = await supabase.auth.signUp({
-            email: fakeEmail,
-            password: pass,
-            options: { data: { username: user } }
-        });
+        result = await supabase.auth.signUp({ email: fakeEmail, password: pass, options: { data: { username: user } } });
     }
 
     const { data, error } = result;
 
     if (error) {
-        authMsg.style.color = 'red';
-        authMsg.textContent = translateError(error.message);
+        authMsg.style.color = 'var(--danger)';
+        authMsg.textContent = 'خطا: اطلاعات اشتباه یا تکراری است';
     } else {
-        if (!isLoginMode && !data.session) {
-            authMsg.textContent = 'ثبت نام انجام شد! لطفا وارد شوید.'; // در حالتی که تایید ایمیل روشن باشد
-        } else {
-            authModal.style.display = 'none';
-            setCurrentUser(data.user);
-            usernameInput.value = '';
-            passwordInput.value = '';
-            alert(isLoginMode ? 'خوش آمدید!' : 'حساب ساخته شد و وارد شدید!');
-        }
+        authModal.style.display = 'none';
+        // اگر ساین‌آپ بود، خودش اتوماتیک لاگین میشه چون کانفرم ایمیل خاموشه
+        if (data.user) setCurrentUser(data.user);
+        
+        usernameInput.value = '';
+        passwordInput.value = '';
+        alert('موفقیت آمیز بود!');
     }
 });
 
 logoutBtn.addEventListener('click', async () => {
     await supabase.auth.signOut();
     currentUser = null;
-    tasks = []; // خالی کردن تسک‌های کاربر قبلی
+    tasks = [];
     userStatusBar.style.display = 'none';
-    authBtn.style.color = 'var(--text-color)';
+    authBtn.style.color = 'var(--text)'; // برگشت رنگ آیکون به حالت عادی
+    authBtn.style.borderColor = 'var(--border)';
     
-    // بارگذاری مجدد تسک‌های لوکال
     const localData = localStorage.getItem('todo_local_tasks');
     if (localData) tasks = JSON.parse(localData);
     renderTasks();
 });
-
-function translateError(msg) {
-    if (msg.includes('Invalid login')) return 'نام کاربری یا رمز اشتباه است';
-    if (msg.includes('already registered')) return 'این نام کاربری قبلا گرفته شده';
-    return msg;
-}
