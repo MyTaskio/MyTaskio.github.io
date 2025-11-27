@@ -1,31 +1,37 @@
 :root {
-    --primary: #007aff;
-    --bg: #f2f2f7; 
+    /* رنگ‌های پیش‌فرض */
+    --primary: #3b82f6;
+    --bg: #f2f2f7;
     --container-bg: #ffffff;
     --input-bg: #f2f2f7;
-    --text: #000000;
+    --text: #1c1c1e;
     --text-light: #8e8e93;
-    --border: #d1d1d6;
+    --border: #e5e5ea;
     --danger: #ff3b30;
     --radius: 20px;
-    --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
     --font-family: 'Vazirmatn', sans-serif;
 }
 
 body.dark-mode {
     --bg: #1c1c1e;
     --container-bg: #2c2c2e;
-    --input-bg: #3a3a3c;
+    --input-bg: #1c1c1e;
     --text: #ffffff;
-    --text-light: #aeaeb2;
-    --border: #48484a;
-    --shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    --text-light: #98989d;
+    --border: #3a3a3c;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
-* { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+/* اعمال فونت وزیر روی همه چیز */
+* { 
+    box-sizing: border-box; 
+    outline: none; 
+    -webkit-tap-highlight-color: transparent;
+    font-family: var(--font-family) !important; 
+}
 
 body {
-    font-family: var(--font-family);
     background-color: var(--bg);
     color: var(--text);
     display: flex;
@@ -33,43 +39,47 @@ body {
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    direction: rtl; /* اجبار راست‌چین */
-    transition: background 0.3s ease, color 0.3s ease;
+    transition: background 0.3s ease;
 }
 
 .app-wrapper {
     width: 100%;
     display: flex;
     justify-content: center;
-    padding: 15px;
+    padding: 20px;
 }
 
+/* افزایش عرض کانتینر برای تسک‌های طولانی */
 .container {
     background: var(--container-bg);
     padding: 2rem;
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     width: 100%;
-    max-width: 440px;
+    max-width: 550px; /* افزایش عرض */
+    transition: all 0.3s ease;
     position: relative;
 }
 
 /* --- Header --- */
-header { margin-bottom: 2rem; }
-
-.header-top {
+header {
     display: flex;
-    justify-content: space-between; /* پخش کردن آیتم‌ها */
+    justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
-    flex-direction: row-reverse; /* دکمه‌ها چپ، تایتل راست */
+    margin-bottom: 2rem;
 }
 
-h1 { font-size: 1.5rem; margin: 0; font-weight: 900; }
+h1 {
+    font-size: 1.4rem;
+    margin: 0;
+    font-weight: 800; /* ضخیم‌تر */
+    letter-spacing: -0.5px;
+}
 
 .header-controls {
     display: flex;
-    gap: 8px;
+    gap: 12px;
+    align-items: center;
 }
 
 .icon-btn {
@@ -77,179 +87,244 @@ h1 { font-size: 1.5rem; margin: 0; font-weight: 900; }
     border: none;
     color: var(--text-light);
     cursor: pointer;
-    padding: 8px;
-    border-radius: 12px;
+    padding: 6px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s;
+}
+
+.icon-btn:hover, .icon-btn.active {
+    color: var(--primary);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.icon-btn svg { width: 24px; height: 24px; }
+
+/* --- Dropdown Menu --- */
+.user-menu-container { position: relative; }
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 45px; left: 0;
+    background: var(--container-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    min-width: 180px;
+    z-index: 50;
+    flex-direction: column;
+    padding: 8px;
+    overflow: hidden;
+}
+.dropdown-menu.show { display: flex; animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+.dropdown-header {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    border-bottom: 1px solid var(--border);
+    font-weight: bold;
+    text-align: right;
+    margin-bottom: 5px;
+}
+
+.dropdown-item {
+    display: block;
+    padding: 12px;
+    background: transparent;
+    border: none;
+    width: 100%;
+    text-align: right;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--text);
+    border-radius: 10px;
     transition: 0.2s;
 }
-.icon-btn:hover, .icon-btn.active { background: var(--input-bg); color: var(--text); }
-.icon-btn svg { width: 22px; height: 22px; }
+.dropdown-item:hover { background: var(--bg); }
+.dropdown-item.text-danger { color: var(--danger); }
+.dropdown-item.text-danger:hover { background: rgba(255, 59, 48, 0.1); }
 
-/* پالت رنگ بازشو */
-.color-palette-row {
-    display: none; /* پیش‌فرض مخفی */
-    gap: 12px;
-    justify-content: flex-end;
-    margin-bottom: 15px;
-    padding: 10px;
-    background: var(--input-bg);
-    border-radius: 12px;
-    animation: fadeIn 0.2s ease;
+@keyframes popIn { from { opacity: 0; transform: scale(0.9) translateY(-10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+/* --- Inputs --- */
+.input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    /* دکمه اد باید سمت چپ باشه در راست چین، یا برعکس. 
+       چون dir=rtl است، دکمه اول کد میفته راست؟ نه.
+       فلکس بدون reverse یعنی المان اول سمت راست.
+       ما میخوایم دکمه سمت چپ باشه. پس اینپوت اول باشه دکمه دوم.
+    */
 }
-.color-palette-row.show { display: flex; }
 
-.color-dot {
-    width: 24px; height: 24px;
+input[type="text"], input[type="password"] {
+    flex: 1;
+    padding: 16px;
+    border: none;
+    border-radius: 16px;
+    background: var(--input-bg);
+    color: var(--text);
+    font-size: 1rem;
+    transition: 0.2s;
+}
+input::placeholder { color: var(--text-light); opacity: 0.7; }
+input:focus { box-shadow: 0 0 0 2px var(--primary); background: var(--container-bg); }
+
+#add-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    transition: transform 0.1s;
+}
+#add-btn:active { transform: scale(0.95); }
+
+/* --- Task List --- */
+ul { list-style: none; padding: 0; margin: 0; }
+
+li {
+    display: flex;
+    align-items: flex-start; /* بالا چین برای متن‌های چند خطی */
+    justify-content: space-between;
+    padding: 16px;
+    background: var(--input-bg);
+    margin-bottom: 12px;
+    border-radius: 18px;
+    transition: all 0.2s;
+    gap: 12px;
+}
+
+/* مدیریت متن طولانی */
+li span { 
+    flex: 1; 
+    font-size: 1rem; 
+    line-height: 1.6;
+    word-break: break-word; /* شکستن کلمات طولانی */
+    white-space: pre-wrap;  /* حفظ خط جدید */
+    margin-top: 2px; /* تراز دقیق با دایره */
+}
+
+.check-circle {
+    width: 26px; height: 26px;
+    border: 2px solid var(--text-light);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: 0.2s;
+    margin-top: 0; /* فیکس تراز */
+}
+
+li.completed { opacity: 0.6; }
+li.completed span { text-decoration: line-through; }
+li.completed .check-circle {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.delete-btn {
+    background: transparent; border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 5px;
+    margin-top: 0;
+    transition: 0.2s;
+    flex-shrink: 0;
+}
+.delete-btn:hover { color: var(--danger); transform: scale(1.1); }
+
+.list-separator {
+    font-size: 0.85rem; color: var(--text-light);
+    text-align: center; margin: 30px 0 20px;
+    position: relative;
+}
+.list-separator::before {
+    content: ""; position: absolute; top: 50%; left: 0; right: 0;
+    height: 1px; background: var(--border); z-index: 0;
+}
+.list-separator span {
+    background: var(--container-bg);
+    padding: 0 15px; position: relative; z-index: 1;
+    border-radius: 10px;
+}
+
+/* --- Modals --- */
+.modal-overlay {
+    display: none;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    justify-content: center; align-items: center;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.modal-overlay.open { display: flex; opacity: 1; }
+
+.modal-box {
+    background: var(--container-bg);
+    padding: 2rem;
+    border-radius: 28px;
+    width: 90%; max-width: 400px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.modal-overlay.open .modal-box { transform: scale(1); }
+
+.modal-inputs { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; width: 100%; }
+
+.primary-btn, .secondary-btn {
+    width: 100%; padding: 14px; border-radius: 14px;
+    border: none; font-size: 1rem; cursor: pointer; font-weight: bold;
+    transition: 0.2s;
+}
+.primary-btn { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+.primary-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4); }
+
+.secondary-btn { background: transparent; color: var(--text-light); border: 2px solid var(--border) !important; }
+.secondary-btn:hover { border-color: var(--text) !important; color: var(--text); }
+
+.close-modal-x {
+    position: absolute; top: 15px; left: 15px;
+    background: transparent; border: none; font-size: 24px;
+    color: var(--text-light); cursor: pointer;
+}
+
+/* --- Color Grid Modal --- */
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    margin: 25px 0;
+    justify-items: center;
+}
+.color-option {
+    width: 35px; height: 35px;
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid transparent;
     transition: transform 0.2s;
 }
-.color-dot:hover { transform: scale(1.1); }
-.color-dot.active { border-color: var(--text); transform: scale(1.1); }
+.color-option:hover { transform: scale(1.15); }
+.color-option.selected { border-color: var(--text); transform: scale(1.1); }
 
-/* --- User Dropdown --- */
-.dropdown-menu {
-    display: none; 
-    position: absolute;
-    top: 65px; left: 20px; /* چپ چین */
-    background: var(--container-bg);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    min-width: 190px;
-    z-index: 50;
-    flex-direction: column;
-    padding: 5px;
+.cancel-btn {
+    background: var(--bg); color: var(--text); border: none;
+    padding: 10px 20px; border-radius: 12px; cursor: pointer;
+    font-size: 0.9rem;
 }
-.dropdown-menu.show { display: flex; animation: fadeIn 0.2s; }
-
-.dropdown-header {
-    padding: 12px; font-size: 0.9rem; color: var(--text);
-    font-weight: bold; border-bottom: 1px solid var(--border); text-align: center;
-}
-.dropdown-item {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px; background: transparent; border: none; width: 100%;
-    cursor: pointer; font-family: inherit; font-size: 0.9rem; color: var(--text);
-    border-radius: 8px; margin-top: 2px;
-}
-.dropdown-item:hover { background: var(--input-bg); }
-.dropdown-item.text-danger { color: var(--danger); }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-
-/* --- Inputs --- */
-.input-group {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 25px;
-    height: 55px;
-    flex-direction: row-reverse; /* دکمه سمت چپ */
-}
-
-input[type="text"], input[type="password"], input[type="email"] {
-    width: 100%; height: 55px; padding: 0 15px;
-    border: none; border-radius: 16px;
-    background: var(--input-bg);
-    color: var(--text);
-    font-family: inherit; font-size: 1rem;
-    transition: 0.2s;
-    text-align: right; /* متن راست‌چین */
-}
-#task-input { flex: 1; }
-input:focus { background: var(--bg); box-shadow: inset 0 0 0 2px var(--primary); }
-
-#add-btn {
-    background: var(--primary); color: white; border: none;
-    width: 55px; height: 55px; border-radius: 16px;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; transition: transform 0.1s;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-#add-btn:active { transform: scale(0.92); }
-
-/* --- Task List (اصلاح RTL) --- */
-ul { list-style: none; padding: 0; margin: 0; }
-
-li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px;
-    background: var(--container-bg);
-    border-bottom: 1px solid var(--border);
-    transition: all 0.2s;
-}
-li:first-child { border-top-left-radius: 16px; border-top-right-radius: 16px; }
-li:last-child { border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; border-bottom: none; }
-
-li span { flex: 1; margin: 0 15px; font-size: 1rem; text-align: right; }
-
-/* چک باکس سمت راست */
-.check-circle {
-    width: 24px; height: 24px;
-    border: 2px solid var(--text-light);
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; transition: 0.2s;
-    order: -1; /* اولویت نمایش */
-}
-
-/* دکمه حذف سمت چپ */
-.delete-btn {
-    background: transparent; border: none; color: var(--text-light);
-    cursor: pointer; padding: 5px; opacity: 0.5; transition: 0.2s;
-    order: 2;
-}
-.delete-btn:hover { color: var(--danger); opacity: 1; }
-
-li.completed span { text-decoration: line-through; color: var(--text-light); }
-li.completed .check-circle { background: var(--primary); border-color: var(--primary); color: white; }
-
-.list-separator {
-    font-size: 0.85rem; color: var(--text-light);
-    font-weight: bold; margin: 30px 0 10px; padding-right: 5px;
-    opacity: 0.8; text-align: right;
-}
-
-/* --- Modals --- */
-.modal-overlay {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
-    justify-content: center; align-items: center; z-index: 100;
-    opacity: 0; transition: opacity 0.3s;
-}
-.modal-overlay.open { display: flex; opacity: 1; }
-
-.modal-box {
-    background: var(--container-bg); padding: 2rem; border-radius: 24px;
-    width: 90%; max-width: 360px; text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    transform: scale(0.9); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    position: relative;
-}
-.modal-overlay.open .modal-box { transform: scale(1); }
-
-.close-btn {
-    position: absolute; top: 15px; right: 15px; /* دکمه بستن راست */
-    background: var(--input-bg); border: none; width: 32px; height: 32px;
-    border-radius: 50%; font-size: 1.2rem; color: var(--text-light); cursor: pointer;
-}
-
-.modal-inputs { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
-.modal-inputs input { height: 50px; }
-.half-input { width: 100%; }
-
-.primary-btn {
-    background: var(--primary); color: white; border: none;
-    width: 100%; padding: 15px; border-radius: 16px;
-    font-size: 1rem; font-weight: bold; cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-.msg-box { min-height: 20px; margin-bottom: 10px; font-size: 0.85rem; color: var(--danger); }
-.switch-auth { margin-top: 20px; font-size: 0.9rem; color: var(--text-light); }
-.switch-auth a { color: var(--primary); text-decoration: none; font-weight: bold; }
