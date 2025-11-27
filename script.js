@@ -1,12 +1,12 @@
-// --- تنظیمات Supabase ---
-const SUPABASE_URL = 'https://zzbnbsmywmpmkqhbloro.supabase.co';
+
+const SUPABASE_URL = 'https:
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6Ym5ic215d21wbWtxaGJsb3JvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODg1NjMsImV4cCI6MjA3OTc2NDU2M30.efyCqT9PLhy-1IPyMAadIzSjmhnIXEMZDOKN4F-P1_M';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// --- متغیرها ---
+
 let tasks = [];
 let currentUser = null;
-let authMode = 'login'; // login | signup | edit
+let authMode = 'login'; 
 
 const THEME_COLORS = [
     '#FFA500', '#2196F3', '#4CAF50', '#E91E63', '#9C27B0', 
@@ -23,7 +23,7 @@ const els = {
     authModal: document.getElementById('auth-modal'),
     closeModal: document.querySelector('.close-modal'),
     submitAuthBtn: document.getElementById('submit-auth-btn'),
-    switchAuthBtn: document.getElementById('switch-auth-btn'), // دکمه سوییچ جدید
+    switchAuthBtn: document.getElementById('switch-auth-btn'), 
     authFooterLinks: document.getElementById('auth-footer-links'),
     modalTitle: document.getElementById('modal-title'),
     fnameInput: document.getElementById('fname-input'),
@@ -40,7 +40,7 @@ const els = {
     alertCancelBtn: document.getElementById('alert-cancel-btn')
 };
 
-// --- شروع برنامه ---
+
 document.addEventListener('DOMContentLoaded', async () => {
     loadLocalSettings();
     
@@ -66,12 +66,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// --- منو ---
+
 function renderMenu() {
     const isDark = document.body.classList.contains('dark-mode');
     let menuHTML = '';
 
-    // آیکون‌های SVG برای تم
+    
     const sunIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
     const moonIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
 
@@ -126,7 +126,7 @@ function renderMenu() {
     els.dropdown.innerHTML = menuHTML;
 }
 
-// --- مدیریت کاربر ---
+
 async function setCurrentUser(user) {
     currentUser = user;
     const meta = user.user_metadata || {};
@@ -150,7 +150,7 @@ async function setCurrentUser(user) {
     fetchTasks();
 }
 
-// --- تسک‌ها (کد قبلی بدون تغییر) ---
+
 function renderTasks() {
     els.todoList.innerHTML = '';
     if (tasks.length === 0) {
@@ -225,7 +225,7 @@ async function deleteTask(id) {
     else saveLocal();
 }
 
-// --- مودال و Auth (آپدیت شده) ---
+
 function openAuthModal(mode) {
     authMode = mode;
     els.dropdown.classList.remove('show');
@@ -241,16 +241,16 @@ function openAuthModal(mode) {
         els.submitAuthBtn.textContent = 'ورود';
         els.signupFields.style.display = 'none';
         els.authFooterLinks.style.display = 'flex';
-        // تغییر متن‌ها طبق درخواست
+        
         document.getElementById('switch-text').textContent = 'حساب ندارید؟';
         els.switchAuthBtn.textContent = 'ثبت نام';
         
     } else if (mode === 'signup') {
         els.modalTitle.textContent = 'ثبت نام کاربر جدید';
         els.submitAuthBtn.textContent = 'ثبت نام';
-        els.signupFields.style.display = 'block'; // نمایش فیلد نام
+        els.signupFields.style.display = 'block'; 
         els.authFooterLinks.style.display = 'flex';
-        // تغییر متن‌ها طبق درخواست
+        
         document.getElementById('switch-text').textContent = 'حساب دارید؟';
         els.switchAuthBtn.textContent = 'ورود';
     }
@@ -264,20 +264,20 @@ function openEditProfile() {
     els.modalTitle.textContent = 'ویرایش مشخصات';
     els.submitAuthBtn.textContent = 'ذخیره تغییرات';
     
-    // 1. نمایش همه فیلدها طبق درخواست
-    els.signupFields.style.display = 'block'; // نام و نام خانوادگی
-    els.credentialsFields.style.display = 'block'; // ایمیل و رمز
     
-    // مخفی کردن دکمه سوییچ در حالت ویرایش
+    els.signupFields.style.display = 'block'; 
+    els.credentialsFields.style.display = 'block'; 
+    
+    
     els.authFooterLinks.style.display = 'none';
     
-    // پر کردن اطلاعات
+    
     const meta = currentUser.user_metadata || {};
     els.fnameInput.value = meta.first_name || '';
     els.lnameInput.value = meta.last_name || '';
-    els.usernameInput.value = currentUser.email || ''; // ایمیل نمایش داده شود
+    els.usernameInput.value = currentUser.email || ''; 
     
-    // رمز عبور خالی باشد (چون رمز قبلی را نداریم و فقط برای تغییر است)
+    
     els.passwordInput.value = '';
     els.passwordInput.placeholder = 'رمز عبور جدید';
 
@@ -290,7 +290,7 @@ els.switchAuthBtn.addEventListener('click', (e) => {
 });
 
 els.submitAuthBtn.addEventListener('click', async () => {
-    // --- حالت ویرایش ---
+    
     if (authMode === 'edit') {
         const fname = els.fnameInput.value.trim();
         const lname = els.lnameInput.value.trim();
@@ -301,11 +301,11 @@ els.submitAuthBtn.addEventListener('click', async () => {
         
         els.submitAuthBtn.textContent = '...';
         
-        // آپدیت داده‌ها
+        
         const updateData = { data: { first_name: fname, last_name: lname } };
-        if (pass.length > 0) updateData.password = pass; // اگر رمز وارد شده بود تغییر بده
-        // تغییر ایمیل در supabase نیاز به تایید ایمیل جدید دارد، فعلا فقط متادیتا و پسورد را هندل میکنیم
-        // یا اگر بخواهیم ایمیل هم عوض شود: updateData.email = email;
+        if (pass.length > 0) updateData.password = pass; 
+        
+        
 
         const { data, error } = await supabase.auth.updateUser(updateData);
         
@@ -317,7 +317,7 @@ els.submitAuthBtn.addEventListener('click', async () => {
         return;
     }
 
-    // --- حالت ورود/ثبت نام ---
+    
     const email = els.usernameInput.value.trim();
     const password = els.passwordInput.value.trim();
     const fname = els.fnameInput.value.trim();
@@ -344,7 +344,7 @@ els.submitAuthBtn.addEventListener('click', async () => {
     }
 });
 
-// --- سایر توابع (بدون تغییر) ---
+
 async function logoutUser() {
     await supabase.auth.signOut();
     currentUser = null;
@@ -408,26 +408,26 @@ function showAlert(msg) {
     openModal(els.alertModal); els.alertOkBtn.onclick = () => closeModalFunc(els.alertModal);
 }
 
-// 1. تابع جدید تاییدیه (با قابلیت تشخیص حذف)
+
 function showConfirm(msg, title = 'تاییدیه', isDestructive = false) {
     return new Promise((resolve) => {
-        // تنظیم متن و عنوان
+        
         els.alertTitle.textContent = title;
         els.alertText.textContent = msg;
         els.alertCancelBtn.style.display = 'inline-block';
 
-        // اگر عملیات حذف است (isDestructive = true)
+        
         if (isDestructive) {
-            els.alertOkBtn.classList.add('destructive'); // اضافه کردن رنگ قرمز
-            els.alertOkBtn.textContent = 'حذف'; // تغییر متن دکمه
+            els.alertOkBtn.classList.add('destructive'); 
+            els.alertOkBtn.textContent = 'حذف'; 
         } else {
-            els.alertOkBtn.classList.remove('destructive'); // حذف رنگ قرمز
-            els.alertOkBtn.textContent = 'باشه'; // متن عادی
+            els.alertOkBtn.classList.remove('destructive'); 
+            els.alertOkBtn.textContent = 'باشه'; 
         }
 
         openModal(els.alertModal);
 
-        // هندل کردن کلیک دکمه‌ها
+        
         els.alertOkBtn.onclick = () => {
             closeModalFunc(els.alertModal);
             resolve(true);
@@ -439,9 +439,9 @@ function showConfirm(msg, title = 'تاییدیه', isDestructive = false) {
     });
 }
 
-// 2. تابع حذف یک تسک (آپدیت شده)
+
 async function deleteTask(id) {
-    // پارامترهای جدید: متن، عنوان، و true برای قرمز شدن
+    
     if (!await showConfirm('آیا مطمئن هستید که می‌خواهید این مورد را حذف کنید؟', 'حذف تسک', true)) return;
     
     tasks = tasks.filter(t => t.id !== id);
@@ -450,10 +450,10 @@ async function deleteTask(id) {
     else saveLocal();
 }
 
-// 3. تابع حذف همه تسک‌ها (آپدیت شده)
+
 async function deleteAllTasks() {
     if (tasks.length === 0) return;
-    // پارامترهای جدید: متن، عنوان، و true برای قرمز شدن
+    
     if (!await showConfirm('همه تسک‌ها پاک شوند؟ غیرقابل برگشت است.', 'حذف همه', true)) return;
 
     if (currentUser) await supabase.from('todos').delete().neq('id', 0);
@@ -464,7 +464,7 @@ async function deleteAllTasks() {
 }
 
 
-// Global Access
+
 window.openAuthModal = openAuthModal;
 window.openEditProfile = openEditProfile;
 window.logoutUser = logoutUser;
