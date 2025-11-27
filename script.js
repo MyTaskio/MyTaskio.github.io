@@ -63,7 +63,8 @@ authIcon.addEventListener('click', () => currentUser ? (confirm('خروج؟') &&
 closeBtn.addEventListener('click', () => authModal.style.display = 'none');
 window.onclick = (e) => { if (e.target == authModal) authModal.style.display = 'none'; };
 
-const getEmail = (u) => `${u}@myapp.local`;
+// *** تغییر مهم: استفاده از دامنه example.com برای رفع ارور invalid email ***
+const getEmail = (u) => `${u}@example.com`;
 
 async function handleAuth(isSignup) {
     const u = authUsernameInput.value.trim();
@@ -77,13 +78,21 @@ async function handleAuth(isSignup) {
 
     if (error) {
         authMessage.style.color = 'red';
-        authMessage.textContent = error.message;
+        // ترجمه خطاهای رایج برای درک بهتر
+        if (error.message.includes('already registered')) {
+            authMessage.textContent = 'این نام کاربری قبلا گرفته شده است.';
+        } else if (error.message.includes('Invalid login')) {
+            authMessage.textContent = 'نام کاربری یا رمز عبور اشتباه است.';
+        } else {
+            authMessage.textContent = error.message;
+        }
     } else {
         currentUser = { id: data.user.id, username: u };
         localStorage.setItem('todo_user', JSON.stringify(currentUser));
         authModal.style.display = 'none';
         updateAuthIconState();
         await loadTasks();
+        alert('خوش آمدید!');
     }
 }
 
