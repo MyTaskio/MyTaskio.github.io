@@ -425,24 +425,3 @@ window.logoutUser = logoutUser;
 window.deleteAllTasks = deleteAllTasks;
 window.toggleDarkMode = toggleDarkMode;
 window.setTheme = setTheme;
-
-// --- تغییر داینامیک فاوآیکون (Favicon) ---
-function updateFavicon(color) {
-    const faviconLink = document.getElementById('dynamic-favicon');
-    
-    // کد SVG آیکون (مربع با گوشه‌های گرد + تیک سفید)
-    // رنگ مربع برابر با متغیر color خواهد بود
-    const svgIcon = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-            <rect width="32" height="32" rx="8" fill="${color}"/>
-            <path d="M9 16L14 21L23 10" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    `.trim();
-
-    // تبدیل SVG به فرمت قابل خواندن برای مرورگر
-    const svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgIcon)}`;
-    
-    // اعمال تغییر
-    faviconLink.setAttribute('href', svgUrl);
-}
-
