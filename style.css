@@ -1,237 +1,279 @@
 :root {
-    --primary-color: #2196F3;
-    --bg-color: #f0f2f5;
+    --primary: #3b82f6;
+    --bg: #f3f4f6;
     --container-bg: #ffffff;
-    --text-color: #333;
-    --border-color: #ddd;
+    --text: #1f2937;
+    --text-light: #6b7280;
+    --border: #e5e7eb;
+    --danger: #ef4444;
+    --radius: 12px;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 body.dark-mode {
-    --bg-color: #18191a;
-    --container-bg: #242526;
-    --text-color: #e4e6eb;
-    --border-color: #3e4042;
+    --bg: #111827;
+    --container-bg: #1f2937;
+    --text: #f3f4f6;
+    --text-light: #9ca3af;
+    --border: #374151;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
 }
 
+* { box-sizing: border-box; outline: none; }
+
 body {
-    font-family: Tahoma, Arial, sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    font-family: "Tahoma", sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* قبلا center بود که در موبایل مشکل داشت */
     min-height: 100vh;
     margin: 0;
-    transition: background 0.3s;
+    padding-top: 50px;
+    transition: background 0.3s ease;
 }
 
 .container {
     background: var(--container-bg);
     padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 400px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    width: 90%;
+    max-width: 450px;
+    transition: background 0.3s ease;
 }
 
+/* --- Header --- */
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
 }
 
-h1 { margin: 0; font-size: 1.5rem; }
+h1 { font-size: 1.5rem; margin: 0; font-weight: 700; }
 
 .header-controls {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
 }
 
-/* استایل دکمه‌های مربعی بالای صفحه */
+/* دکمه‌های مربعی */
 .icon-btn {
-    background: var(--bg-color);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    width: 40px;  /* عرض ثابت */
-    height: 40px; /* ارتفاع ثابت */
-    border-radius: 10px; /* کمی گرد */
-    cursor: pointer;
-    font-size: 1.2rem;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    border-radius: 8px;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
     padding: 0;
-    transition: 0.2s;
 }
 
-.icon-btn:hover { background: var(--border-color); }
-
-.icon-btn-group {
-    display: flex;
-    gap: 5px;
-    background: var(--bg-color);
-    padding: 5px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
+.icon-btn:hover {
+    background: var(--bg);
+    border-color: var(--primary);
+    color: var(--primary);
 }
 
-.theme-color {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
+.color-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--border);
+}
+
+input[type="color"] {
+    width: 200%; height: 200%;
+    border: none; padding: 0; margin: -50%;
     cursor: pointer;
 }
 
-/* استایل ورودی و دکمه افزودن */
-.input-group {
+/* --- Status Bar --- */
+.status-bar {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(59, 130, 246, 0.1);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: var(--primary);
 }
+
+.text-btn {
+    background: none; border: none;
+    color: var(--danger); cursor: pointer;
+    font-size: 0.85rem;
+}
+
+/* --- Inputs --- */
+.input-group { display: flex; gap: 10px; margin-bottom: 20px; }
 
 input[type="text"], input[type="password"] {
     flex: 1;
-    padding: 10px;
-    border: 1px solid var(--border-color);
+    padding: 12px;
+    border: 1px solid var(--border);
     border-radius: 8px;
-    background: var(--bg-color);
-    color: var(--text-color);
-    outline: none;
+    background: var(--bg);
+    color: var(--text);
+    font-family: inherit;
+    transition: 0.2s;
 }
 
-#addTaskBtn {
-    background: var(--primary-color);
+input:focus { border-color: var(--primary); }
+
+#add-btn {
+    background: var(--primary);
     color: white;
     border: none;
-    padding: 10px 20px;
+    width: 48px; /* مربعی */
     border-radius: 8px;
     cursor: pointer;
-    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* استایل لیست تسک‌ها */
-ul { list-style: none; padding: 0; }
+#add-btn:hover { opacity: 0.9; }
 
-.task-item {
-    background: var(--bg-color);
-    margin-bottom: 10px;
-    padding: 12px;
-    border-radius: 8px;
+/* --- Task List --- */
+ul { list-style: none; padding: 0; margin: 0; }
+
+li {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    transition: 0.3s;
+    padding: 12px;
+    background: var(--bg);
+    margin-bottom: 8px;
+    border-radius: 8px;
+    transition: all 0.2s;
     border: 1px solid transparent;
 }
 
-.task-content {
+li:hover { border-color: var(--border); }
+
+li span { flex: 1; margin: 0 10px; word-break: break-all; }
+
+/* دکمه چک (دایره سفارشی) */
+.check-circle {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--text-light);
+    border-radius: 50%;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    flex: 1;
+    justify-content: center;
+    transition: 0.2s;
+    flex-shrink: 0;
 }
 
-/* دایره چک‌باکس */
-.check-circle {
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--primary-color);
-    border-radius: 50%;
-    display: inline-block;
-    position: relative;
-    transition: 0.2s;
+.check-circle svg {
+    width: 14px; height: 14px;
+    color: white;
+    display: none; /* مخفی در حالت عادی */
 }
 
 /* حالت تکمیل شده */
-.task-item.completed .check-circle {
-    background-color: var(--primary-color);
-}
-/* تیک سفید داخل دایره */
-.task-item.completed .check-circle::after {
-    content: '✓';
-    color: white;
-    font-size: 14px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
+li.completed { opacity: 0.6; }
+li.completed span { text-decoration: line-through; }
 
-.task-item.completed span {
-    text-decoration: line-through;
-    opacity: 0.6;
+li.completed .check-circle {
+    background: var(--primary);
+    border-color: var(--primary);
 }
+li.completed .check-circle svg { display: block; }
 
+/* دکمه حذف */
 .delete-btn {
-    background: transparent;
-    border: none;
+    background: transparent; border: none;
+    color: var(--text-light);
     cursor: pointer;
-    font-size: 1.2rem;
-    opacity: 0.5;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: 0.2s;
 }
-.delete-btn:hover { opacity: 1; transform: scale(1.1); }
 
-/* خط جداکننده */
-.completed-separator {
-    border: 0;
-    height: 1px;
-    background: var(--border-color);
-    margin: 20px 0;
-    position: relative;
-    overflow: visible;
+.delete-btn:hover {
+    color: var(--danger);
+    background: rgba(239, 68, 68, 0.1);
 }
-.completed-separator::after {
-    content: 'تسک‌های انجام شده';
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
+
+/* جداکننده */
+.list-separator {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    text-align: center;
+    margin: 20px 0 10px;
+    position: relative;
+}
+.list-separator::before {
+    content: "";
+    position: absolute; top: 50%; left: 0; right: 0;
+    height: 1px; background: var(--border); z-index: 0;
+}
+.list-separator span {
     background: var(--container-bg);
     padding: 0 10px;
-    font-size: 0.8rem;
-    color: var(--text-color);
-    opacity: 0.7;
+    position: relative;
+    z-index: 1;
 }
 
-/* استایل مودال */
+/* --- Modal --- */
 .modal {
     display: none;
-    position: fixed;
-    top: 0; right: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(3px);
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 100;
 }
+
 .modal-content {
     background: var(--container-bg);
     padding: 2rem;
-    border-radius: 15px;
-    width: 300px;
+    border-radius: var(--radius);
+    width: 90%; max-width: 350px;
     text-align: center;
     position: relative;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
-.close-btn {
-    position: absolute;
-    top: 10px; left: 15px;
-    font-size: 24px;
+
+.close-modal {
+    position: absolute; left: 15px; top: 15px;
+    background: none; border: none;
+    color: var(--text-light);
     cursor: pointer;
 }
-.modal-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-.modal-actions button {
-    flex: 1;
+
+.modal-inputs { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+
+.primary-btn {
+    width: 100%;
     padding: 10px;
-    border-radius: 8px;
+    background: var(--primary);
+    color: white;
     border: none;
+    border-radius: 8px;
     cursor: pointer;
+    font-size: 1rem;
 }
-#loginBtn { background: var(--primary-color); color: white; }
-.secondary-btn { background: transparent; border: 1px solid var(--primary-color) !important; color: var(--text-color); }
+
+.switch-auth { margin-top: 15px; font-size: 0.9rem; color: var(--text-light); }
+.switch-auth a { color: var(--primary); text-decoration: none; font-weight: bold; }
+#auth-msg { margin-top: 10px; font-size: 0.85rem; min-height: 20px; }
