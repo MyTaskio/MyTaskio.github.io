@@ -1,238 +1,258 @@
 :root {
-    /* رنگ‌های روشن (iOS Light) */
-    --primary: #3b82f6;
-    --bg: #f2f2f7; /* طوسی خیلی روشن پس زمینه iOS */
+    --primary-color: #2196F3;
+    --bg-color: #f4f7fc;
     --container-bg: #ffffff;
-    --input-bg: #f2f2f7;
-    --text: #1c1c1e;
-    --text-light: #8e8e93;
-    --border: #e5e5ea;
-    --danger: #ff3b30;
-    --radius: 18px;
-    --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    --font-family: 'Vazirmatn', sans-serif;
+    --text-color: #333;
+    --text-light: #888;
+    --border-color: #e0e0e0;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --btn-secondary-bg: #f0f0f0;
+    --btn-secondary-text: #555;
 }
 
 body.dark-mode {
-    /* رنگ‌های تیره (iOS Dark) */
-    --bg: #1C1C1E; /* سیاه مایل به خاکستری */
-    --container-bg: #2C2C2E; /* کارت کمی روشن‌تر */
-    --input-bg: #1C1C1E;
-    --text: #ffffff;
-    --text-light: #98989d;
-    --border: #3a3a3c;
-    --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    /* پالت رنگی استاندارد iOS */
+    --bg-color: #1C1C1E;      /* رنگ پس‌زمینه اصلی (System Background Dark) */
+    --container-bg: #2C2C2E;  /* رنگ باکس وسط (Secondary System Background) */
+    --text-color: #FFFFFF;    /* متن اصلی: سفید */
+    --text-light: #8E8E93;    /* متن فرعی: طوسی استاندارد اپل (System Gray) */
+    --border-color: #38383A;  /* خطوط جداکننده */
+    --shadow: 0 4px 20px rgba(0,0,0,0.4); /* سایه ملایم */
+    
+    /* دکمه‌های ثانویه (مثل دکمه انصراف) */
+    --btn-secondary-bg: #3A3A3C; 
+    --btn-secondary-text: #FFFFFF;
 }
 
-* { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+
+* { 
+    box-sizing: border-box; 
+    outline: none; 
+    font-family: 'Vazirmatn', sans-serif !important; 
+}
 
 body {
-    font-family: var(--font-family);
-    background-color: var(--bg);
-    color: var(--text);
+    background-color: var(--bg-color);
+    color: var(--text-color);
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* چینش عمودی برای قرارگیری لوگو بالای باکس */
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    transition: background 0.3s ease;
+    padding: 40px 40px; /* فاصله از بالا و پایین برای اسکرول */
+    transition: background 0.3s;
+    direction: rtl;
 }
 
 .brand-logo {
-    font-size: 2.8rem;
-    color: var(--primary);
-    margin-bottom: 30px;
-    letter-spacing: 1px;
+    font-size: 2.8rem; 
+    color: var(--primary-color);
+    margin-bottom: 40px;
+    letter-spacing: 1px; 
     text-transform: uppercase;
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 700;
+    font-family: 'Montserrat', sans-serif !important; 
     cursor: default;
+
+    /* تنظیم روی حالت Bold */
+    font-weight: 700; 
 }
+
+
+
 
 .container {
     background: var(--container-bg);
     padding: 2rem;
-    border-radius: var(--radius);
+    border-radius: 24px;
     box-shadow: var(--shadow);
     width: 100%;
     max-width: 420px;
-    transition: all 0.3s ease;
     position: relative;
+    /* حذف min-height ثابت برای جلوگیری از فضای خالی زیاد در موبایل */
 }
 
-/* --- Header --- */
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
-    flex-direction: row-reverse;
+    margin-bottom: 30px;
+    flex-direction: row-reverse; 
 }
 
-h1 {
-    font-size: 1.4rem;
-    margin: 0;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-}
-
-.header-controls {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
+h1 { margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
 
 .icon-btn {
-    background: transparent;
-    border: none;
-    color: var(--text-light);
-    cursor: pointer;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.2s;
-}
-
-.icon-btn:hover, .icon-btn.active {
-    color: var(--primary);
-}
-
-.icon-btn svg { width: 24px; height: 24px; }
-
-/* --- Dropdown --- */
-.user-menu-container { position: relative; }
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    top: 40px; left: 0;
-    background: var(--container-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-    min-width: 180px;
-    z-index: 50;
-    flex-direction: column;
-    overflow: hidden;
-}
-.dropdown-menu.show { display: flex; animation: fadeIn 0.2s; }
-.dropdown-header {
-    padding: 12px; font-size: 0.9rem; font-weight: bold;
-    background: rgba(0,0,0,0.03); border-bottom: 1px solid var(--border);
-    text-align: right; color: var(--text);
-}
-.dropdown-item {
-    display: flex; align-items: center; gap: 10px; padding: 12px;
-    background: transparent; border: none; width: 100%; text-align: right;
-    cursor: pointer; font-family: inherit; font-size: 0.9rem; color: var(--text);
-}
-.dropdown-item:hover { background: var(--bg); }
-.dropdown-item.text-danger { color: var(--danger); }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-
-/* --- Input Box --- */
-.input-group {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 25px;
-    position: relative;
-}
-
-#todo-input {
-    flex: 1;
-    padding: 16px;
-    border: none;
-    border-radius: 16px;
-    background: var(--input-bg);
-    color: var(--text);
-    font-family: inherit;
-    font-size: 1rem;
+    background: transparent; border: none; color: var(--text-color);
+    cursor: pointer; padding: 8px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
     transition: 0.2s;
 }
-#todo-input:focus { box-shadow: 0 0 0 2px var(--primary); }
+.icon-btn:hover { background: var(--bg-color); }
+
+.settings-wrapper { position: relative; }
+.dropdown-menu {
+    position: absolute; top: 120%; left: 0;
+    background: var(--container-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px; width: 260px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    display: none; flex-direction: column; z-index: 100;
+    padding: 10px; overflow: hidden;
+}
+.dropdown-menu.show { display: flex; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+
+.menu-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px; border-radius: 10px; cursor: pointer;
+    font-size: 0.9rem; color: var(--text-color); transition: 0.2s; margin-bottom: 4px;
+}
+.menu-item:hover { background: var(--bg-color); }
+.menu-item.danger { color: #ef4444; }
+.menu-item.danger:hover { background: rgba(239, 68, 68, 0.1); } /* قرمز خیلی ملایم در هاور */
+
+.color-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+    padding: 10px; background: var(--bg-color); border-radius: 12px; margin: 8px 0;
+}
+.color-circle {
+    width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
+    border: 2px solid transparent; transition: transform 0.2s;
+}
+.color-circle:hover { transform: scale(1.2); }
+
+.input-group { display: flex; gap: 10px; margin-bottom: 25px; }
+
+#todo-input {
+    flex: 1; padding: 14px 16px; border: none; border-radius: 14px;
+    background: var(--bg-color); color: var(--text-color);
+    font-family: inherit; font-size: 1rem; text-align: right;
+}
+#todo-input::placeholder { color: var(--text-light); opacity: 0.7; }
 
 #add-btn {
-    background: var(--primary);
-    border: none;
+    background: var(--primary-color);
     color: white;
-    width: 54px;
-    border-radius: 16px;
+    border: none;
+    width: 48px; height: 48px;
+    border-radius: 14px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s;
+    box-shadow: none; 
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    transition: transform 0.1s;
 }
 #add-btn:active { transform: scale(0.95); }
 
-/* --- Task List --- */
 ul { list-style: none; padding: 0; margin: 0; }
-li {
-    background: var(--container-bg);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all 0.3s;
-}
-li:last-child { border-bottom: none; }
-li.completed span { text-decoration: line-through; color: var(--text-light); }
 
-.task-actions { display: flex; gap: 8px; }
-.action-btn {
-    background: transparent; border: none; cursor: pointer;
-    padding: 5px; border-radius: 8px; color: var(--text-light);
+.task-item {
+    background: var(--bg-color); margin-bottom: 10px; padding: 12px 12px 12px 16px;
+    border-radius: 14px; display: flex; align-items: center; justify-content: space-between; transition: 0.3s;
+}
+
+.task-left { display: flex; align-items: center; gap: 12px; flex: 1; overflow: hidden; }
+
+.check-circle {
+    width: 22px; height: 22px; border: 2px solid var(--text-light); /* بوردر متناسب با تم */
+    border-radius: 50%;
+    cursor: pointer; flex-shrink: 0; position: relative; opacity: 0.6;
+}
+.check-circle.checked { background: var(--primary-color); border-color: var(--primary-color); opacity: 1; }
+.check-circle.checked::after {
+    content: '✓'; color: white; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); font-size: 14px;
+}
+
+.task-text { font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.delete-btn {
+    background: transparent; border: none; color: var(--text-light);
+    cursor: pointer; padding: 5px; opacity: 0.5; transition: 0.2s; margin-right: 10px;
+}
+.delete-btn:hover { color: #ef4444; opacity: 1; transform: scale(1.1); }
+
+.completed-section {
+    border-top: 1px solid var(--border-color); margin-top: 20px; padding-top: 20px; position: relative;
+}
+.completed-label {
+    position: absolute; top: -10px; right: 50%; transform: translateX(50%);
+    background: var(--container-bg); padding: 0 10px; font-size: 0.8rem; color: var(--text-light);
+}
+
+.task-item.completed { opacity: 0.6; background: transparent; border: 1px solid var(--border-color); }
+.task-item.completed .task-text { text-decoration: line-through; }
+
+/* Auth Footer & Secondary Button */
+.auth-footer {
     display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin-top: 20px; font-size: 0.9rem; color: var(--text-color);
 }
-.delete-btn:hover { color: var(--danger); background: rgba(255, 59, 48, 0.1); }
-.check-btn:hover { color: var(--primary); background: rgba(59, 130, 246, 0.1); }
 
-/* --- Modal --- */
+.secondary-btn {
+    background: var(--btn-secondary-bg);
+    color: var(--btn-secondary-text);
+    border: none; padding: 6px 12px; border-radius: 8px;
+    cursor: pointer; font-size: 0.9rem; font-family: inherit; transition: 0.2s;
+}
+.secondary-btn:hover { opacity: 0.8; }
+
+/* Modal */
 .modal {
     display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.6); justify-content: center; align-items: center;
-    z-index: 1000; backdrop-filter: blur(4px);
+    z-index: 1000; backdrop-filter: blur(3px);
 }
-.modal.open { display: flex; } /* کلاس کمکی */
-
+.modal.open { display: flex; }
 .modal-content {
-    background: var(--container-bg); padding: 30px 25px; border-radius: 24px;
-    width: 90%; max-width: 340px; text-align: center; position: relative;
+    background: var(--container-bg); padding: 25px; border-radius: 24px;
+    width: 90%; max-width: 320px; text-align: center; position: relative;
     box-shadow: var(--shadow);
 }
-
-.close-modal {
-    position: absolute; top: 20px; left: 20px;
-    width: 32px; height: 32px;
-    background-color: rgba(255, 59, 48, 0.15);
-    color: #ff3b30;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.2s ease; z-index: 10;
-    font-size: 0; /* مخفی کردن متن اضافی */
-}
-.close-modal:hover { background-color: #ff3b30; color: white; transform: scale(1.1); }
-.close-modal svg { width: 18px; height: 18px; }
-
 .auth-input {
-    width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border);
-    border-radius: 12px; background: var(--input-bg); color: var(--text); text-align: right;
-    font-size: 0.95rem;
+    width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border-color);
+    border-radius: 12px; background: var(--bg-color); color: var(--text-color); text-align: right;
 }
 .ltr-input { direction: ltr; text-align: left; }
 .ltr-input::placeholder { text-align: right; direction: rtl; }
 
 #submit-auth-btn {
-    width: 100%; background: var(--primary); color: white;
-    border: none; padding: 14px; border-radius: 14px; font-weight: bold;
-    cursor: pointer; margin-top: 10px; font-size: 1rem;
+    width: 100%; background: var(--primary-color); color: white;
+    border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px;
+}
+.close-modal {
+    position: absolute;
+    top: 20px;
+    left: 20px; /* سمت چپ بالا قرار می‌گیرد */
+    
+    width: 32px;
+    height: 32px;
+    
+    /* پس‌زمینه قرمز خیلی کمرنگ */
+    background-color: rgba(255, 59, 48, 0.15);
+    
+    /* رنگ ضربدر قرمز پررنگ */
+    color: #ff3b30;
+    
+    border-radius: 50%; /* دایره کامل */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
 }
 
-.error-msg { color: var(--danger); font-size: 0.85rem; min-height: 1.2rem; margin: 8px 0; }
+.close-modal:hover {
+    /* در حالت هاور: قرمز پر می‌شود و ضربدر سفید می‌شود */
+    background-color: #ff3b30;
+    color: white;
+    transform: scale(1.1); /* کمی بزرگتر شود */
+}
 
-.alert-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-.alert-buttons button { padding: 10px 24px; border-radius: 10px; border:none; cursor: pointer; font-weight: bold; }
-#alert-ok-btn { background: var(--primary); color: white; }
+.error-msg { color: #ef4444; font-size: 0.8rem; min-height: 1rem; margin: 5px 0; }
+.alert-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+.alert-buttons button { padding: 8px 20px; border-radius: 8px; border:none; cursor: pointer; }
+#alert-ok-btn { background: var(--primary-color); color: white; }
