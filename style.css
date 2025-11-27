@@ -1,28 +1,27 @@
 :root {
-    /* رنگ‌های روشن (iOS Light) */
-    --primary: #007aff; /* آبی استاندارد iOS */
+    /* تنظیمات اولیه */
+    --primary: #007aff; /* رنگ پیش فرض آبی */
     --bg: #f2f2f7; 
     --container-bg: #ffffff;
     --input-bg: #f2f2f7;
     --text: #000000;
     --text-light: #8e8e93;
-    --border: #c6c6c8;
+    --border: #d1d1d6;
     --danger: #ff3b30;
-    --radius: 18px;
-    --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    --radius: 20px;
+    --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     --font-family: 'Vazirmatn', sans-serif;
 }
 
 body.dark-mode {
-    /* رنگ‌های تیره (iOS Dark) */
-    --primary: #0a84ff;
-    --bg: #000000;
-    --container-bg: #1c1c1e;
-    --input-bg: #2c2c2e;
+    /* دارک مود سافت (iOS Dark) - نه مشکی مطلق */
+    --bg: #1c1c1e; /* خاکستری خیلی تیره */
+    --container-bg: #2c2c2e;
+    --input-bg: #3a3a3c;
     --text: #ffffff;
-    --text-light: #98989d;
-    --border: #38383a;
-    --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    --text-light: #aeaeb2;
+    --border: #48484a;
+    --shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -36,14 +35,15 @@ body {
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    transition: background 0.3s ease;
+    direction: rtl; /* راست به چپ کلی */
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 .app-wrapper {
     width: 100%;
     display: flex;
     justify-content: center;
-    padding: 20px;
+    padding: 15px;
 }
 
 .container {
@@ -52,147 +52,137 @@ body {
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     width: 100%;
-    max-width: 420px;
+    max-width: 440px;
     transition: all 0.3s ease;
     position: relative;
 }
 
 /* --- Header --- */
-header {
+header { margin-bottom: 2rem; }
+
+.header-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 15px;
 }
 
-h1 {
-    font-size: 1.6rem;
-    margin: 0;
-    font-weight: 800;
-}
+h1 { font-size: 1.5rem; margin: 0; font-weight: 900; }
 
 .header-controls {
     display: flex;
-    gap: 15px;
-    align-items: center;
+    gap: 10px;
 }
 
-/* دکمه‌های آیکون */
+/* دکمه‌های آیکون - تک رنگ خاکستری */
 .icon-btn {
     background: transparent;
     border: none;
-    color: var(--primary);
+    color: var(--text-light); /* پیش فرض خاکستری */
     cursor: pointer;
     padding: 8px;
-    border-radius: 50%;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s;
+    transition: 0.2s;
 }
 
-.icon-btn:hover {
-    background: rgba(128, 128, 128, 0.1);
+.icon-btn:hover, .icon-btn.active {
+    background: var(--input-bg);
+    color: var(--text); /* هاور مشکی/سفید */
 }
+.icon-btn svg { width: 24px; height: 24px; }
 
-.icon-btn svg {
-    width: 24px;
-    height: 24px;
+/* پالت رنگ */
+.color-palette {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end; /* سمت چپ (در حالت RTL) */
+    margin-bottom: 10px;
 }
+.color-dot {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.2s;
+}
+.color-dot:hover { transform: scale(1.2); }
+/* نشان دادن رنگ انتخاب شده */
+.color-dot.active { border-color: var(--text); }
 
-/* --- منوی کشویی کاربر --- */
-.user-menu-container { position: relative; }
+/* --- User Dropdown --- */
 .dropdown-menu {
     display: none; 
     position: absolute;
-    top: 45px; left: 0;
-    background: var(--container-bg); /* همرنگ کارت اصلی */
+    top: 60px; right: 30px; /* موقعیت سمت راست */
+    background: var(--container-bg);
     border: 1px solid var(--border);
     border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.25);
     min-width: 180px;
     z-index: 50;
-    overflow: hidden;
     flex-direction: column;
     padding: 5px;
 }
 .dropdown-menu.show { display: flex; animation: fadeIn 0.2s; }
-
 .dropdown-header {
-    padding: 12px;
-    font-size: 0.9rem;
-    color: var(--text-light);
-    border-bottom: 1px solid var(--border);
-    font-weight: bold;
-    text-align: center;
+    padding: 10px; font-size: 0.85rem; color: var(--text-light);
+    border-bottom: 1px solid var(--border); text-align: center;
 }
-
 .dropdown-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* آیکون و متن دو طرف */
-    padding: 12px;
-    background: transparent;
-    border: none;
-    width: 100%;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 0.95rem;
-    color: var(--text);
-    border-radius: 8px;
-    margin-top: 5px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px; background: transparent; border: none; width: 100%;
+    cursor: pointer; font-family: inherit; font-size: 0.9rem; color: var(--text);
+    border-radius: 8px; margin-top: 5px;
 }
 .dropdown-item:hover { background: var(--input-bg); }
 .dropdown-item.text-danger { color: var(--danger); }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* --- Inputs (IOS Style) --- */
+/* --- Inputs --- */
 .input-group {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     margin-bottom: 25px;
-    flex-direction: row-reverse; 
+    height: 55px; /* ارتفاع ثابت برای تراز شدن */
 }
 
-/* استایل مشترک تمام اینپوت ها */
 input[type="text"], input[type="password"], input[type="email"] {
     width: 100%;
-    padding: 16px;
+    height: 55px;
+    padding: 0 15px;
     border: none; 
-    border-radius: 14px;
+    border-radius: 16px;
     background: var(--input-bg);
     color: var(--text);
     font-family: inherit;
     font-size: 1rem;
     transition: 0.2s;
-    margin-bottom: 10px; /* فاصله پیش فرض */
 }
-input::placeholder { color: var(--text-light); opacity: 0.7; }
-input:focus { background: var(--bg); }
+/* اینپوت تسک باید تمام فضا را بگیرد */
+#task-input { flex: 1; }
 
-/* استایل مخصوص دو فیلد کنار هم (نام و نام خانوادگی) */
-.half-input {
-    flex: 1;
-    margin-bottom: 0 !important; /* مارجین را حذف میکنیم چون در فلکس هستند */
-}
+input:focus { background: var(--bg); box-shadow: inset 0 0 0 2px var(--primary); }
 
 #add-btn {
     background: var(--primary);
     color: white;
     border: none;
-    width: 54px;
-    height: 54px; /* هم ارتفاع اینپوت */
-    border-radius: 14px;
+    width: 55px; /* مربع */
+    height: 55px;
+    border-radius: 16px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 4px 10px rgba(0, 122, 255, 0.3);
     transition: transform 0.1s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
-#add-btn:active { transform: scale(0.95); }
+#add-btn:active { transform: scale(0.92); }
 
 /* --- Task List --- */
 ul { list-style: none; padding: 0; margin: 0; }
@@ -202,101 +192,81 @@ li {
     align-items: center;
     justify-content: space-between;
     padding: 16px;
-    background: var(--container-bg); /* زمینه سفید/تیره */
-    border-bottom: 1px solid var(--border); /* خط جدا کننده */
+    background: var(--container-bg);
+    border-bottom: 1px solid var(--border);
     transition: all 0.2s;
 }
-/* تسک اول و آخر گرد باشند */
-li:first-child { border-top-left-radius: 14px; border-top-right-radius: 14px; }
-li:last-child { border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; border-bottom: none; }
+li:first-child { border-top-left-radius: 16px; border-top-right-radius: 16px; }
+li:last-child { border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; border-bottom: none; }
 
-li span { flex: 1; margin: 0 12px; font-size: 1.05rem; }
+li span { flex: 1; margin: 0 15px; font-size: 1rem; text-align: right; }
 
-/* دایره چک */
 .check-circle {
     width: 24px; height: 24px;
     border: 2px solid var(--text-light);
     border-radius: 50%;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: 0.2s;
+    flex-shrink: 0; transition: 0.2s;
 }
 
-/* حالت تکمیل شده */
 li.completed span { text-decoration: line-through; color: var(--text-light); }
 li.completed .check-circle {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
+    background: var(--primary); border-color: var(--primary); color: white;
 }
 
-/* دکمه حذف */
 .delete-btn {
-    background: transparent; border: none;
-    color: var(--text-light);
-    cursor: pointer;
-    padding: 5px;
-    opacity: 0.5;
-    transition: 0.2s;
+    background: transparent; border: none; color: var(--text-light);
+    cursor: pointer; padding: 5px; opacity: 0.5; transition: 0.2s;
 }
 .delete-btn:hover { color: var(--danger); opacity: 1; }
 
 /* جداکننده */
 .list-separator {
-    font-size: 0.9rem; color: var(--text-light);
-    font-weight: bold;
-    margin: 30px 0 10px;
-    padding-right: 10px;
+    font-size: 0.85rem; color: var(--text-light);
+    font-weight: bold; margin: 30px 0 10px; padding-right: 5px;
+    opacity: 0.8;
 }
 
-/* --- Custom Modal --- */
+/* --- Modals --- */
 .modal-overlay {
     display: none;
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.4);
-    backdrop-filter: blur(5px);
+    background: rgba(0,0,0,0.5); /* تیرگی پشت زمینه */
+    backdrop-filter: blur(8px);
     justify-content: center; align-items: center;
     z-index: 100;
-    opacity: 0;
-    transition: opacity 0.3s;
+    opacity: 0; transition: opacity 0.3s;
 }
 .modal-overlay.open { display: flex; opacity: 1; }
 
 .modal-box {
     background: var(--container-bg);
-    padding: 2rem;
-    border-radius: 24px;
-    width: 90%; max-width: 340px;
+    padding: 2rem; border-radius: 24px;
+    width: 90%; max-width: 350px;
     text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-    transform: scale(0.95);
-    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    transform: scale(0.9); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .modal-overlay.open .modal-box { transform: scale(1); }
 
 .close-btn {
-    position: absolute; top: 15px; right: 15px;
-    background: var(--input-bg);
-    border: none; width: 30px; height: 30px; border-radius: 50%;
-    font-size: 1.2rem; color: var(--text-light); cursor: pointer;
+    position: absolute; top: 15px; left: 15px; /* چپ چین */
+    background: var(--input-bg); border: none; width: 32px; height: 32px;
+    border-radius: 50%; font-size: 1.2rem; color: var(--text-light); cursor: pointer;
 }
 
-.modal-inputs { margin: 20px 0; width: 100%; text-align: right; }
+.modal-inputs { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
+.modal-inputs input { margin: 0; height: 50px; } /* ارتفاع ورودی های مودال */
+.half-input { width: 100%; } /* در موبایل تمام عرض */
 
 .primary-btn {
-    background: var(--primary);
-    color: white;
-    border: none;
-    width: 100%;
-    padding: 14px;
-    border-radius: 14px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
+    background: var(--primary); color: white; border: none;
+    width: 100%; padding: 15px; border-radius: 16px;
+    font-size: 1rem; font-weight: bold; cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
-.switch-auth { margin-top: 15px; font-size: 0.9rem; color: var(--text-light); }
+.switch-auth { margin-top: 20px; font-size: 0.9rem; color: var(--text-light); }
 .switch-auth a { color: var(--primary); text-decoration: none; font-weight: bold; }
-
-.msg-box { margin-bottom: 15px; font-size: 0.9rem; min-height: 20px; line-height: 1.5; }
+.msg-box { min-height: 20px; margin-bottom: 10px; font-size: 0.85rem; }
