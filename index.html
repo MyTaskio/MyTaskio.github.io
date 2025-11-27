@@ -5,54 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لیست کارها</title>
     <link rel="stylesheet" href="style.css">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Vazir Font (Optional for Persian look) -->
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-    <!-- Supabase Client -->
+    <!-- اضافه کردن کتابخانه Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
     <div class="container">
-        <header class="app-header">
-            <div class="controls">
-                <button id="theme-color-btn" title="تغییر رنگ تم"><i class="fa-solid fa-palette"></i></button>
-                <button id="theme-mode-btn" title="حالت شب/روز"><i class="fa-solid fa-moon"></i></button>
-                <button id="auth-btn" title="حساب کاربری"><i class="fa-solid fa-user"></i></button>
-            </div>
+        <header>
             <h1>لیست کارها</h1>
+            <div class="header-controls">
+                <!-- دکمه‌های مربعی -->
+                <button id="authIcon" class="icon-btn" title="ورود / ثبت نام">👤</button>
+                <button id="themeToggleBtn" class="icon-btn" title="تغییر تم">🌙</button>
+                <div class="color-picker icon-btn-group">
+                    <div class="theme-color" style="background: #4CAF50;" data-color="#4CAF50"></div>
+                    <div class="theme-color" style="background: #2196F3;" data-color="#2196F3"></div>
+                    <div class="theme-color" style="background: #FF5722;" data-color="#FF5722"></div>
+                </div>
+            </div>
         </header>
 
         <div class="input-group">
-            <input type="text" id="todo-input" placeholder="کار جدید را وارد کنید...">
-            <button id="add-btn">افزودن</button>
+            <input type="text" id="taskInput" placeholder="کار جدید را بنویسید...">
+            <button id="addTaskBtn">افزودن</button>
         </div>
 
-        <ul id="todo-list">
-            <!-- Tasks will be added here -->
+        <ul id="taskList">
+            <!-- لیست کارها اینجا قرار می‌گیرد -->
         </ul>
-        
-        <div id="user-info-display" class="hidden">
-            <span id="username-span"></span>
-            <button id="logout-btn" class="small-btn">خروج</button>
-        </div>
     </div>
 
-    <!-- Auth Modal -->
-    <div id="auth-modal" class="modal hidden">
+    <!-- مودال ورود و ثبت نام -->
+    <div id="authModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2 id="modal-title">ورود / ثبت نام</h2>
-            <div class="auth-form">
-                <input type="email" id="email-input" placeholder="ایمیل (اختیاری برای تست)" style="display:none;"> <!-- Supabase uses email usually, but we map user/pass -->
-                <input type="text" id="username-input" placeholder="نام کاربری (حداقل ۴ حرف)">
-                <input type="password" id="password-input" placeholder="رمز عبور (حداقل ۴ حرف)">
-                <div class="auth-actions">
-                    <button id="login-submit-btn" class="primary-btn">ورود</button>
-                    <button id="signup-submit-btn" class="secondary-btn">ثبت نام</button>
-                </div>
-                <p id="auth-message"></p>
+            <span class="close-btn">&times;</span>
+            <h2>ورود / ثبت نام</h2>
+            <p id="authMessage"></p>
+            <input type="text" id="authUsername" placeholder="نام کاربری (انگلیسی)">
+            <input type="password" id="authPassword" placeholder="رمز عبور">
+            <div class="modal-actions">
+                <button id="loginBtn">ورود</button>
+                <button id="signupBtn" class="secondary-btn">ثبت نام</button>
             </div>
         </div>
     </div>
