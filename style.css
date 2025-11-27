@@ -287,3 +287,40 @@ ul { list-style: none; padding: 0; margin: 0; }
 #alert-ok-btn.destructive:hover {
     background-color: #d32f2f !important;
 }
+
+
+/* --- Mobile Responsive Fixes --- */
+@media (max-width: 600px) {
+    body {
+        /* کاهش حاشیه دور صفحه در موبایل */
+        padding: 40px 16px !important;
+        
+        /* تغییر چینش برای جلوگیری از چسبیدن به بالا */
+        justify-content: flex-start;
+        padding-top: 80px !important;
+    }
+
+    .brand-logo {
+        /* کوچک‌تر کردن لوگو در موبایل */
+        font-size: 2.2rem;
+        margin-bottom: 30px;
+    }
+
+    .container {
+        /* استفاده از حداکثر فضا */
+        width: 100%;
+        max-width: 100%;
+        border-radius: 20px;
+        padding: 1.5rem; /* کمی جمع‌وجورتر کردن داخل باکس */
+    }
+    
+    /* تنظیم دکمه افزودن و اینپوت */
+    .input-group {
+        gap: 8px;
+    }
+    
+    #add-btn {
+        width: 45px;
+        height: 45px;
+    }
+}
