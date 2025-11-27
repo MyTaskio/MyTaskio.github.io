@@ -6,19 +6,20 @@
     --text-light: #888;
     --border-color: #e0e0e0;
     --shadow: 0 4px 20px rgba(0,0,0,0.08);
-    --btn-secondary-bg: #f0f0f0; /* رنگ طوسی دکمه */
+    --btn-secondary-bg: #f0f0f0;
     --btn-secondary-text: #555;
 }
 
 body.dark-mode {
-    --bg-color: #18191a;
-    --container-bg: #242526;
-    --text-color: #e4e6eb;
-    --text-light: #b0b3b8;
-    --border-color: #3e4042;
-    --shadow: 0 4px 20px rgba(0,0,0,0.4);
-    --btn-secondary-bg: #3a3b3c;
-    --btn-secondary-text: #e4e6eb;
+    /* رنگ‌های جدید و روشن‌تر برای دارک مود */
+    --bg-color: #202124;      /* خاکستری ملایم به جای مشکی */
+    --container-bg: #303134;  /* کارت کمی روشن‌تر */
+    --text-color: #e8eaed;    /* سفید مایل به طوسی برای مطالعه راحت‌تر */
+    --text-light: #9aa0a6;
+    --border-color: #5f6368;
+    --shadow: 0 4px 20px rgba(0,0,0,0.3);
+    --btn-secondary-bg: #3c4043;
+    --btn-secondary-text: #e8eaed;
 }
 
 * { 
@@ -31,12 +32,26 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     display: flex;
+    flex-direction: column; /* چینش عمودی برای قرارگیری لوگو بالای باکس */
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    padding: 40px 20px; /* فاصله از بالا و پایین برای اسکرول */
     transition: background 0.3s;
     direction: rtl;
+}
+
+/* استایل لوگوی جدید */
+.brand-logo {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: sans-serif !important; /* برای لوگوی انگلیسی فونت ساده بهتر است */
+    cursor: default;
 }
 
 .container {
@@ -44,10 +59,10 @@ body {
     padding: 2rem;
     border-radius: 24px;
     box-shadow: var(--shadow);
-    width: 90%;
+    width: 100%;
     max-width: 420px;
     position: relative;
-    min-height: 500px;
+    /* حذف min-height ثابت برای جلوگیری از فضای خالی زیاد در موبایل */
 }
 
 header {
@@ -88,7 +103,7 @@ h1 { margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
 }
 .menu-item:hover { background: var(--bg-color); }
 .menu-item.danger { color: #ef4444; }
-.menu-item.danger:hover { background: #fee2e2; }
+.menu-item.danger:hover { background: rgba(239, 68, 68, 0.1); } /* قرمز خیلی ملایم در هاور */
 
 .color-grid {
     display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
@@ -107,6 +122,7 @@ h1 { margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
     background: var(--bg-color); color: var(--text-color);
     font-family: inherit; font-size: 1rem; text-align: right;
 }
+#todo-input::placeholder { color: var(--text-light); opacity: 0.7; }
 
 #add-btn {
     background: var(--primary-color);
@@ -115,7 +131,6 @@ h1 { margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--text-color); }
     width: 48px; height: 48px;
     border-radius: 14px;
     cursor: pointer;
-    /* حذف سایه */
     box-shadow: none; 
     flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
@@ -134,10 +149,11 @@ ul { list-style: none; padding: 0; margin: 0; }
 .task-left { display: flex; align-items: center; gap: 12px; flex: 1; overflow: hidden; }
 
 .check-circle {
-    width: 22px; height: 22px; border: 2px solid #bbb; border-radius: 50%;
-    cursor: pointer; flex-shrink: 0; position: relative;
+    width: 22px; height: 22px; border: 2px solid var(--text-light); /* بوردر متناسب با تم */
+    border-radius: 50%;
+    cursor: pointer; flex-shrink: 0; position: relative; opacity: 0.6;
 }
-.check-circle.checked { background: var(--primary-color); border-color: var(--primary-color); }
+.check-circle.checked { background: var(--primary-color); border-color: var(--primary-color); opacity: 1; }
 .check-circle.checked::after {
     content: '✓'; color: white; position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -50%); font-size: 14px;
@@ -164,25 +180,15 @@ ul { list-style: none; padding: 0; margin: 0; }
 
 /* Auth Footer & Secondary Button */
 .auth-footer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
-    font-size: 0.9rem;
-    color: var(--text-color);
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin-top: 20px; font-size: 0.9rem; color: var(--text-color);
 }
 
 .secondary-btn {
     background: var(--btn-secondary-bg);
     color: var(--btn-secondary-text);
-    border: none;
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-family: inherit;
-    transition: 0.2s;
+    border: none; padding: 6px 12px; border-radius: 8px;
+    cursor: pointer; font-size: 0.9rem; font-family: inherit; transition: 0.2s;
 }
 .secondary-btn:hover { opacity: 0.8; }
 
@@ -196,6 +202,7 @@ ul { list-style: none; padding: 0; margin: 0; }
 .modal-content {
     background: var(--container-bg); padding: 25px; border-radius: 24px;
     width: 90%; max-width: 320px; text-align: center; position: relative;
+    box-shadow: var(--shadow);
 }
 .auth-input {
     width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border-color);
@@ -208,7 +215,7 @@ ul { list-style: none; padding: 0; margin: 0; }
     width: 100%; background: var(--primary-color); color: white;
     border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px;
 }
-.close-modal { position: absolute; left: 15px; top: 15px; font-size: 24px; cursor: pointer; }
+.close-modal { position: absolute; left: 15px; top: 15px; font-size: 24px; cursor: pointer; color: var(--text-color); }
 .error-msg { color: #ef4444; font-size: 0.8rem; min-height: 1rem; margin: 5px 0; }
 .alert-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
 .alert-buttons button { padding: 8px 20px; border-radius: 8px; border:none; cursor: pointer; }
