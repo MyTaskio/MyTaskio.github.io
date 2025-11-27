@@ -289,32 +289,25 @@ ul { list-style: none; padding: 0; margin: 0; }
 }
 
 
-/* --- Mobile Responsive Fixes --- */
 @media (max-width: 600px) {
     body {
-        /* کاهش حاشیه دور صفحه در موبایل */
         padding: 40px 16px !important;
-        
-        /* تغییر چینش برای جلوگیری از چسبیدن به بالا */
         justify-content: flex-start;
         padding-top: 80px !important;
     }
 
     .brand-logo {
-        /* کوچک‌تر کردن لوگو در موبایل */
         font-size: 2.2rem;
-        margin-bottom: 30px;
+        margin-bottom: 40px;
     }
 
     .container {
-        /* استفاده از حداکثر فضا */
         width: 100%;
         max-width: 100%;
         border-radius: 20px;
-        padding: 1.5rem; /* کمی جمع‌وجورتر کردن داخل باکس */
+        padding: 1.5rem;
     }
     
-    /* تنظیم دکمه افزودن و اینپوت */
     .input-group {
         gap: 8px;
     }
@@ -324,3 +317,4 @@ ul { list-style: none; padding: 0; margin: 0; }
         height: 45px;
     }
 }
+
