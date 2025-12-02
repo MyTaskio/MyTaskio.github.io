@@ -92,6 +92,47 @@
     </div>
 </div>
 
+<!-- مودال جدید برای افزودن/ویرایش تسک -->
+<div id="task-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="close-task-modal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </span>
+        <h2 id="task-modal-title">ایجاد وظیفه جدید</h2>
+
+        <div class="task-form">
+            <input type="hidden" id="task-id-input">
+            
+            <label for="task-text-input">عنوان وظیفه</label>
+            <input type="text" id="task-text-input" placeholder="مثلا: طراحی صفحه اصلی" class="auth-input">
+
+            <label for="task-priority-select">اولویت</label>
+            <select id="task-priority-select" class="auth-input">
+                <option value="0">بدون اولویت</option>
+                <option value="1">پایین</option>
+                <option value="2">متوسط</option>
+                <option value="3">بالا</option>
+            </select>
+            
+            <label for="task-due-date-input">تاریخ سررسید</label>
+            <input type="date" id="task-due-date-input" class="auth-input ltr-input">
+
+            <label for="task-tags-input">تگ‌ها (با Enter جدا کنید)</label>
+            <div id="tags-container" class="tags-input-container">
+                <input type="text" id="task-tags-input" placeholder="مثلا: پروژه، شخصی" class="auth-input">
+            </div>
+            
+            <p id="task-error-msg" class="error-msg"></p>
+            
+            <button id="save-task-btn">ذخیره وظیفه</button>
+        </div>
+    </div>
+</div>
+    
+    
 <script src="script.js"></script>
 </body>
 </html>
