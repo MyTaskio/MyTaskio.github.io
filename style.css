@@ -338,3 +338,120 @@ ul { list-style: none; padding: 0; margin: 0; }
     justify-content: center;
     flex-shrink: 0;
 }
+
+/* === استایل‌های مودال تسک === */
+.task-form label {
+    display: block;
+    text-align: right;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 5px;
+    margin-top: 15px;
+}
+#save-task-btn {
+    width: 100%; background: var(--primary-color); color: white;
+    border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 20px;
+}
+
+/* === استایل‌های ورودی تگ === */
+.tags-input-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 5px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-color);
+}
+#task-tags-input {
+    flex-grow: 1;
+    border: none;
+    background: transparent;
+    padding: 7px;
+    margin: 0;
+    width: auto;
+    min-width: 100px;
+}
+.tag-pill {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    margin: 2px;
+}
+.tag-pill .remove-tag {
+    margin-right: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* === استایل‌های نمایش جزئیات تسک در لیست === */
+.task-item {
+    align-items: flex-start; /* تغییر برای چیدمان عمودی جزئیات */
+    padding: 12px;
+    position: relative;
+    overflow: hidden; /* برای نوار اولویت */
+}
+.task-content {
+    display: flex;
+    flex-direction: column; /* چیدمان عمودی متن و جزئیات */
+    flex-grow: 1;
+    gap: 8px;
+    margin-right: 12px;
+}
+.task-text {
+    white-space: normal; /* اجازه شکستن خط */
+}
+.task-details {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+.due-date-display, .tags-display {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.due-date-display.overdue {
+    color: #ef4444;
+    font-weight: bold;
+}
+.tags-display .tag-pill-sm {
+    background-color: var(--btn-secondary-bg);
+    color: var(--btn-secondary-text);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+}
+/* نوار نشانگر اولویت */
+.priority-indicator {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background-color: transparent;
+    border-top-right-radius: 14px;
+    border-bottom-right-radius: 14px;
+}
+.priority-1 { background-color: #34c759; } /* پایین */
+.priority-2 { background-color: #ff9500; } /* متوسط */
+.priority-3 { background-color: #ff3b30; } /* بالا */
+
+/* بازنویسی task-left برای هم‌راستایی بهتر */
+.task-left {
+    align-items: flex-start;
+    padding-top: 4px; /* برای هم‌ترازی با متن */
+}
+
+/* تغییر در سایز آیکون سررسید */
+.due-date-display svg {
+    width: 14px;
+    height: 14px;
+}
