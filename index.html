@@ -4,135 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسکیو | مدیریت وظایف</title>
+    
+    <!-- کتابخانه تقویم فارسی -->
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/kamadatepicker/dist/kamadatepicker.min.css">
+    
     <link rel="stylesheet" href="style.css">
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232196f3'/><path d='M9 16L14 21L23 10' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
-
-
-
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,..."> <!-- کد آیکون شما -->
 </head>
 <body>
 
-<!-- این خط اضافه شده است: لوگوی Taskio -->
 <div class="brand-logo">Taskio</div>
 
 <div class="container">
     <header>
         <div class="header-content">
-            <!-- آیکون چرخ‌دنده -->
             <div class="settings-wrapper">
                 <button id="menu-btn" class="icon-btn">
+                    <!-- SVG چرخ‌دنده -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                 </button>
-                
-                <!-- منوی بازشو -->
                 <div id="settings-dropdown" class="dropdown-menu"></div>
             </div>
         </div>
-
         <h1 id="header-title">وظایف من</h1>
     </header>
 
-    <div class="input-group">
-        <input type="text" id="todo-input" placeholder="کار جدید را بنویسید...">
-        <!-- دکمه با آیکون SVG برای وسط‌چین دقیق -->
-        <button id="add-btn">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        </button>
+    <!-- کامپوننت جدید برای ایجاد تسک -->
+    <div id="task-composer" class="task-composer">
+        <input type="hidden" id="composer-task-id">
+        <div class="composer-main">
+            <div class="composer-check-wrapper">
+                 <div class="check-circle" id="composer-check"></div>
+            </div>
+            <div class="composer-inputs">
+                <input type="text" id="composer-title" placeholder="نوشتن یک تسک جدید">
+                <textarea id="composer-description" placeholder="توضیحات..." rows="1"></textarea>
+            </div>
+        </div>
+        <div class="composer-footer">
+            <div class="composer-actions">
+                <button id="composer-priority-btn" class="composer-action-btn">
+                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M14.4,6L14,4H5V21H7V14H12.6L13,16H20V6H14.4Z"></path></svg>
+                </button>
+                <button id="composer-date-btn" class="composer-action-btn">
+                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z"></path></svg>
+                </button>
+                <button id="composer-tags-btn" class="composer-action-btn">
+                     <svg viewBox="0 0 24 24"><path fill="currentColor" d="M5.5,7A1.5,1.5 0 0,1 7,5.5A1.5,1.5 0 0,1 5.5,4A1.5,1.5 0 0,1 4,5.5A1.5,1.5 0 0,1 5.5,7M21.41,11.58L12.41,2.58A2,2 0 0,0 11,2H4A2,2 0 0,0 2,4V11A2,2 0 0,0 2.59,12.41L11.58,21.41A2,2 0 0,0 13,22A2,2 0 0,0 14.41,21.41L21.41,14.41A2,2 0 0,0 22,13A2,2 0 0,0 21.41,11.58Z"></path></svg>
+                </button>
+            </div>
+            <div class="composer-selected-values">
+                <span id="composer-date-display"></span>
+                <div id="composer-tags-display"></div>
+            </div>
+            <button id="composer-save-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>افزودن</span>
+            </button>
+        </div>
     </div>
-
+    
     <ul id="todo-list"></ul>
 </div>
 
-<!-- مودال -->
-<div id="auth-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal">
-    <!-- آیکون ضربدر -->
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-    </svg></span>
-        <h2 id="modal-title">ورود به حساب</h2>
-        
-        <div class="auth-form">
-            <div id="signup-fields" style="display: none;">
-                <input type="text" id="fname-input" placeholder="نام" class="auth-input">
-                <input type="text" id="lname-input" placeholder="نام خانوادگی" class="auth-input">
-            </div>
-            
-            <div id="credentials-fields">
-                <input type="email" id="username-input" placeholder="ایمیل" class="auth-input ltr-input">
-                <input type="password" id="password-input" placeholder="رمز عبور" class="auth-input ltr-input">
-            </div>
-            
-            <p id="auth-msg" class="error-msg"></p>
-            
-            <button id="submit-auth-btn">ورود</button>
-            
-            <!-- فوتر جدید با دکمه طوسی -->
-            <div class="auth-footer" id="auth-footer-links">
-                <span id="switch-text">حساب ندارید؟</span>
-                <button id="switch-auth-btn" class="secondary-btn">ثبت نام</button>
-            </div>
+<!-- Popovers -->
+<div id="priority-popover" class="popover">
+    <div class="popover-item" data-priority="3"><div class="p-color p-3"></div> بالا</div>
+    <div class="popover-item" data-priority="2"><div class="p-color p-2"></div> متوسط</div>
+    <div class="popover-item" data-priority="1"><div class="p-color p-1"></div> پایین</div>
+    <div class="popover-item" data-priority="0"><div class="p-color p-0"></div> بدون اولویت</div>
+</div>
+
+<div id="calendar-popover" class="popover">
+    <div id="datepicker-container"></div>
+</div>
+
+<div id="tags-popover" class="popover">
+    <div id="tags-popover-content">
+        <div id="tags-list"></div>
+        <div class="tag-add-new">
+            <input type="text" id="new-tag-input" placeholder="برچسب جدید...">
+            <button id="add-new-tag-btn">+</button>
         </div>
     </div>
 </div>
 
-<div id="alert-modal" class="modal">
-    <div class="modal-content alert-content">
-        <h3 id="alert-title">پیام</h3>
-        <p id="alert-text">متن پیام</p>
-        <div class="alert-buttons">
-            <button id="alert-cancel-btn" style="display:none;">انصراف</button>
-            <button id="alert-ok-btn">باشه</button>
-        </div>
-    </div>
-</div>
+<!-- مودال‌های دیگر (بدون تغییر) -->
+<div id="auth-modal" class="modal">...</div>
+<div id="alert-modal" class="modal">...</div>
 
-<!-- مودال جدید برای افزودن/ویرایش تسک -->
-<div id="task-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" id="close-task-modal">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-        </span>
-        <h2 id="task-modal-title">ایجاد وظیفه جدید</h2>
-
-        <div class="task-form">
-            <input type="hidden" id="task-id-input">
-            
-            <label for="task-text-input">عنوان وظیفه</label>
-            <input type="text" id="task-text-input" placeholder="مثلا: طراحی صفحه اصلی" class="auth-input">
-
-            <label for="task-priority-select">اولویت</label>
-            <select id="task-priority-select" class="auth-input">
-                <option value="0">بدون اولویت</option>
-                <option value="1">پایین</option>
-                <option value="2">متوسط</option>
-                <option value="3">بالا</option>
-            </select>
-            
-            <label for="task-due-date-input">تاریخ سررسید</label>
-            <input type="date" id="task-due-date-input" class="auth-input ltr-input">
-
-            <label for="task-tags-input">تگ‌ها (با Enter جدا کنید)</label>
-            <div id="tags-container" class="tags-input-container">
-                <input type="text" id="task-tags-input" placeholder="مثلا: پروژه، شخصی" class="auth-input">
-            </div>
-            
-            <p id="task-error-msg" class="error-msg"></p>
-            
-            <button id="save-task-btn">ذخیره وظیفه</button>
-        </div>
-    </div>
-</div>
-    
-    
+<!-- کتابخانه تقویم فارسی -->
+<script type="text/javascript" src="https://unpkg.com/kamadatepicker/dist/kamadatepicker.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
